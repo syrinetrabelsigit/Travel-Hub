@@ -95,9 +95,10 @@ function Header() {
               <span className="cart-badge">3</span>
             </Link>
 
-            <button className="btn-login">
-              Log In
-            </button>
+            <Link to="/login" className="btn-login">
+              <span className="login">Log In</span>
+            </Link>
+
 
             {/* Menu burger pour mobile */}
             <button 

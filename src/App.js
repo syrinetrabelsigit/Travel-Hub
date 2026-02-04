@@ -1,12 +1,15 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
 // Layout components
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 
-// Pages
+// Composant ProtectedRoute
+import ProtectedRoute from './components/common/ProtectedRoute';
+
+// Pages (vos collègues)
 import Home from './pages/Home';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -17,6 +20,27 @@ import Preferences from './pages/Preferences';
 import Cart from './pages/Cart';
 import OrderSummary from './pages/OrderSummary';
 
+// Pages d'authentification (votre travail)
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+
+// Pages de recherche (votre travail)
+import Search from './pages/Search';
+import SearchResults from './pages/SearchResults';
+
+// Pages de détails (votre travail)
+import FlightDetails from './pages/FlightDetails';
+import HotelDetails from './pages/HotelDetails';
+import ActivityDetails from './pages/ActivityDetails';
+
+// Pages de réservation (votre travail)
+import BookingForm from './pages/BookingForm';
+import BookingConfirmation from './pages/BookingConfirmation';
+
+// Pages d'avis (votre travail)
+import Reviews from './pages/Reviews';
+
 function App() {
   return (
     <Router>
@@ -24,15 +48,78 @@ function App() {
         <Header />
         <main>
           <Routes>
+            {/* Routes de votre collègue */}
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/terms" element={<TermsConditions />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/booking-history" element={<BookingHistory />} />
-            <Route path="/preferences" element={<Preferences />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/order-summary" element={<OrderSummary />} />
+
+            {/* Routes protégées de votre collègue */}
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/booking-history" 
+              element={
+                <ProtectedRoute>
+                  <BookingHistory />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/preferences" 
+              element={
+                <ProtectedRoute>
+                  <Preferences />
+                </ProtectedRoute>
+              } 
+            />
+
+            {/* VOS ROUTES - Authentification (publiques) */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            
+            {/* VOS ROUTES - Recherche (publiques) */}
+            <Route path="/search" element={<Search />} />
+            <Route path="/search/results" element={<SearchResults />} />
+            <Route path="/search/:type/results" element={<SearchResults />} />
+            
+            {/* VOS ROUTES - Détails (publiques) */}
+            <Route path="/flights/:id" element={<FlightDetails />} />
+            <Route path="/hotels/:id" element={<HotelDetails />} />
+            <Route path="/activities/:id" element={<ActivityDetails />} />
+            
+            {/* VOS ROUTES - Avis (publiques) */}
+            <Route path="/reviews/:type/:id" element={<Reviews />} />
+            
+            {/* VOS ROUTES - Réservation (protégées) */}
+            <Route 
+              path="/booking/:type/:id" 
+              element={
+                <ProtectedRoute>
+                  <BookingForm />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/booking/confirmation/:id" 
+              element={
+                <ProtectedRoute>
+                  <BookingConfirmation />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Route 404 */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
         <Footer />

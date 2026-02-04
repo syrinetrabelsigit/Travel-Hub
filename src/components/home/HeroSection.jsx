@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // AJOUT
 import './HeroSection.css';
 
 function HeroSection() {
+  const navigate = useNavigate(); // AJOUT
   const [searchType, setSearchType] = useState('flights');
   const [searchData, setSearchData] = useState({
     from: '',
@@ -28,7 +30,14 @@ function HeroSection() {
   const handleSearch = (e) => {
     e.preventDefault();
     console.log('Recherche:', searchType, searchData);
-    // Logique de recherche sera implémentée par Cyrine
+    
+    // MODIFIÉ : Redirection vers VOTRE page de recherche avec les paramètres
+    navigate('/search', { 
+      state: { 
+        searchType,
+        searchData 
+      } 
+    });
   };
 
   return (

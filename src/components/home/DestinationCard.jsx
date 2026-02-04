@@ -1,8 +1,22 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // AJOUT
 import './DestinationCard.css';
 
 function DestinationCard({ destination }) {
+  const navigate = useNavigate(); // AJOUT
   const { name, country, image, description, price, rating, reviews } = destination;
+
+  // AJOUT : Fonction pour rediriger vers la recherche
+  const handleExplore = () => {
+    navigate('/search', { 
+      state: { 
+        searchType: 'hotels', // Par défaut chercher des hôtels pour cette destination
+        searchData: {
+          destination: name
+        }
+      } 
+    });
+  };
 
   return (
     <div className="destination-card">
@@ -35,7 +49,8 @@ function DestinationCard({ destination }) {
             <span className="price-label">À partir de</span>
             <span className="price-value">{price}DT</span>
           </div>
-          <button className="btn-explore">
+          {/* MODIFIÉ : Ajout de onClick */}
+          <button className="btn-explore" onClick={handleExplore}>
             Explorer
             <span className="arrow-icon">→</span>
           </button>

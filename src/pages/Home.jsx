@@ -1,9 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // AJOUT
 import './Home.css';
 import HeroSection from '../components/home/HeroSection';
 import DestinationCard from '../components/home/DestinationCard';
 
 function Home() {
+  const navigate = useNavigate(); // AJOUT
+
   // Données des destinations populaires
   const popularDestinations = [
     {
@@ -91,6 +94,17 @@ function Home() {
     }
   ];
 
+  // AJOUT : Fonction pour gérer la réservation d'offres
+  const handleOfferBooking = (offer) => {
+    navigate('/search'); // Rediriger vers votre page de recherche
+  };
+
+  // AJOUT : Fonction pour l'inscription à la newsletter
+  const handleNewsletterSubmit = (e) => {
+    e.preventDefault();
+    alert('Merci pour votre inscription !');
+  };
+
   return (
     <div className="home">
       {/* Hero Section */}
@@ -135,7 +149,13 @@ function Home() {
                     <span className="validity-icon">⏰</span>
                     Valable jusqu'au {offer.validUntil}
                   </p>
-                  <button className="btn-offer">Réserver maintenant</button>
+                  {/* MODIFIÉ : Ajout de la fonction onClick */}
+                  <button 
+                    className="btn-offer"
+                    onClick={() => handleOfferBooking(offer)}
+                  >
+                    Réserver maintenant
+                  </button>
                 </div>
               </div>
             ))}
@@ -216,7 +236,8 @@ function Home() {
                 Inscrivez-vous à notre newsletter
               </p>
             </div>
-            <form className="newsletter-form">
+            {/* MODIFIÉ : Ajout de onSubmit */}
+            <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
               <input 
                 type="email" 
                 placeholder="Votre adresse email" 
