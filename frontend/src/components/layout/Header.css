@@ -1,0 +1,652 @@
+/* ==================== HEADER STYLES - 3 VERSIONS ==================== */
+
+/* Header de base */
+.header {
+  background: var(--bg-white);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  gap: 2rem;
+}
+
+/* ==================== LOGO ==================== */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.logo-icon {
+  font-size: 2rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.logo-text {
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.5px;
+}
+
+/* Badge Admin dans le logo */
+.admin-badge-logo {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* ==================== NAVIGATION ==================== */
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.nav-link {
+  position: relative;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-base);
+  transition: all 0.3s ease;
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-link:hover {
+  color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.nav-link.active {
+  color: var(--primary-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary-color);
+  border-radius: var(--border-radius-full);
+}
+
+/* Lien Admin spécial */
+.nav-link-admin {
+  color: var(--primary-color) !important;
+  font-weight: 700 !important;
+  background: linear-gradient(135deg, #F3E8FF 0%, #d5dbff 100%);
+  padding: 0.5rem 1rem !important;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.header-admin .nav-link-admin {
+  background: rgba(255, 255, 255, 0.2);
+  color: white !important;
+}
+
+.nav-link-admin:hover {
+  background: linear-gradient(135deg, #E9D5FF 0%, #DDD6FE 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.header-admin .nav-link-admin:hover {
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+.admin-icon {
+  font-size: 1.2rem;
+}
+
+.mobile-only-links {
+  display: none;
+}
+
+.logout-link {
+  background: #FEE2E2;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  color: #DC2626 !important;
+  font-weight: 600 !important;
+  margin-top: 0.5rem;
+  border-radius: 8px;
+  padding: 0.75rem 1rem !important;
+}
+
+.logout-link:hover {
+  background: #FEF2F2;
+}
+
+.dropdown-divider-mobile {
+  height: 2px;
+  background: #E5E7EB;
+  margin: 1rem 0;
+}
+
+/* ==================== HEADER ACTIONS ==================== */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Bouton Language */
+.btn-language {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 2px solid var(--bg-grey);
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  font-weight: var(--font-weight-medium);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.header-admin .btn-language {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.btn-language:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.header-admin .btn-language:hover {
+  border-color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.language-icon {
+  font-size: 1.2rem;
+}
+
+/* Bouton Cart */
+.btn-cart {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--bg-light);
+  border-radius: var(--border-radius-full);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.header-admin .btn-cart {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.btn-cart:hover {
+  background: var(--primary-light);
+  color: var(--bg-white);
+  transform: scale(1.1);
+}
+
+.header-admin .btn-cart:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.cart-icon {
+  font-size: 1.3rem;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--danger-color);
+  color: var(--text-white);
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-bold);
+  padding: 0.2rem 0.4rem;
+  border-radius: var(--border-radius-full);
+  min-width: 20px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ==================== USER DROPDOWN ==================== */
+.user-dropdown {
+  position: relative;
+}
+
+/* Bouton Profile User */
+.btn-profile-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #1E40AF 100%);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-profile-user:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+}
+
+/* Bouton Profile Admin */
+.btn-profile-admin {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 0.6rem 1.25rem;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-profile-admin:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.profile-icon {
+  font-size: 1.2rem;
+}
+
+.user-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.admin-badge {
+  background: rgba(255, 217, 61, 0.9);
+  color: #1E293B;
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  min-width: 280px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+}
+
+.user-dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-header {
+  padding: 1.25rem;
+  border-bottom: 2px solid #F1F5F9;
+  background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
+  border-radius: 12px 12px 0 0;
+}
+
+.dropdown-user-name {
+  font-weight: 700;
+  color: #1E293B;
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+}
+
+.dropdown-user-email {
+  font-size: 0.85rem;
+  color: #64748B;
+  margin: 0 0 0.5rem 0;
+}
+
+.dropdown-admin-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #445de9 0%, #122dc5 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-top: 0.5rem;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #E5E7EB;
+  margin: 0.5rem 0;
+}
+
+.dropdown-section-title {
+  padding: 0.75rem 1.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  color: #475569;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.dropdown-item:hover {
+  background: #F8FAFC;
+  color: #1E293B;
+}
+
+.dropdown-icon {
+  font-size: 1.1rem;
+}
+
+.dropdown-item-admin {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.dropdown-item-admin:hover {
+  background: #f7f8ff;
+}
+
+.dropdown-item-logout {
+  color: #DC2626;
+  font-weight: 600;
+}
+
+.dropdown-item-logout:hover {
+  background: #FEE2E2;
+}
+
+/* ==================== BOUTONS LOGIN/REGISTER ==================== */
+.btn-login,
+.btn-register {
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.btn-login {
+  background: var(--primary-color);
+  color: var(--text-white);
+}
+
+.btn-login:hover {
+  background: var(--primary-dark);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  color: var(--text-white);
+}
+
+.btn-register {
+  background: white;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+}
+
+.btn-register:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* ==================== MENU TOGGLE (Burger) ==================== */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.menu-toggle span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background: var(--primary-color);
+  border-radius: var(--border-radius-full);
+  transition: all 0.3s ease;
+}
+
+.header-admin .menu-toggle span {
+  background: white;
+}
+
+.menu-toggle.open span:nth-child(1) {
+  transform: rotate(45deg) translate(8px, 8px);
+}
+
+.menu-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+/* Tablette */
+@media (max-width: 1024px) {
+  .navigation {
+    gap: 1.5rem;
+  }
+
+  .btn-language span {
+    display: none;
+  }
+
+  .language-icon {
+    font-size: 1.4rem;
+  }
+
+  .user-name {
+    display: none;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0.75rem 0;
+  }
+
+  /* Navigation mobile */
+  .navigation {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 85%;
+    max-width: 350px;
+    height: 100vh;
+    background: var(--bg-white);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding: 5rem 2rem 2rem;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease;
+    overflow-y: auto;
+  }
+
+  .header-admin .navigation {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .navigation.open {
+    right: 0;
+  }
+
+  .nav-link {
+    width: 100%;
+    padding: 1rem 0;
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--bg-grey);
+  }
+
+  .header-admin .nav-link {
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .nav-link.active::after {
+    display: none;
+  }
+
+  .mobile-only-links {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--bg-grey);
+  }
+
+  .header-admin .mobile-only-links {
+    border-top-color: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Menu toggle visible */
+  .menu-toggle {
+    display: flex;
+  }
+
+  /* Masquer certains éléments sur mobile */
+  .btn-language {
+    display: none;
+  }
+
+  .user-dropdown {
+    display: none;
+  }
+
+  .btn-cart {
+    width: 35px;
+    height: 35px;
+  }
+
+  .btn-login,
+  .btn-register {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .logo-text {
+    font-size: 1.2rem;
+  }
+
+  .logo-icon {
+    font-size: 1.5rem;
+  }
+
+  .admin-badge-logo {
+    font-size: 0.6rem;
+    padding: 0.2rem 0.5rem;
+  }
+}
+
+/* Très petit écran */
+@media (max-width: 480px) {
+  .navigation {
+    width: 100%;
+    max-width: none;
+  }
+
+  .btn-login,
+  .btn-register {
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+/* Overlay pour fermer le menu mobile */
+@media (max-width: 768px) {
+  .navigation.open::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+  }
+}

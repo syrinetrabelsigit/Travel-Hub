@@ -1,0 +1,339 @@
+/* DESTINATION CARD STYLES */
+.destination-card {
+  background: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.destination-card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* DESTINATION IMAGE */
+.destination-image {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+}
+
+.destination-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.destination-card:hover .destination-image img {
+  transform: scale(1.15);
+}
+
+.destination-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0) 50%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 1rem;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.destination-card:hover .destination-overlay {
+  opacity: 1;
+}
+
+.btn-favorite {
+  background: var(--bg-white);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-favorite:hover {
+  transform: scale(1.1);
+  background: var(--danger-color);
+}
+
+.btn-favorite:hover .heart-icon {
+  filter: brightness(0) invert(1);
+}
+
+.heart-icon {
+  font-size: 1.2rem;
+  transition: filter var(--transition-fast);
+}
+
+/* DESTINATION CONTENT */
+.destination-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+/* DESTINATION HEADER */
+.destination-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.destination-info {
+  flex: 1;
+}
+
+.destination-name {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.destination-country {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.destination-country::before {
+  content: '📍';
+  font-size: 0.9rem;
+}
+
+/* DESTINATION RATING */
+.destination-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--bg-light);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--border-radius);
+  white-space: nowrap;
+}
+
+.rating-star {
+  font-size: 1rem;
+}
+
+.rating-value {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+.rating-reviews {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+/* DESTINATION DESCRIPTION */
+.destination-description {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+
+/* DESTINATION FOOTER */
+.destination-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--bg-grey);
+}
+
+/* DESTINATION PRICE */
+.destination-price {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.price-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.price-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+}
+
+/* BUTTON EXPLORE */
+.btn-explore {
+  background: var(--primary-color);
+  color: var(--text-white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-explore:hover {
+  background: var(--primary-dark);
+  transform: translateX(5px);
+  box-shadow: var(--shadow-md);
+}
+
+.arrow-icon {
+  font-size: 1rem;
+  transition: transform var(--transition-fast);
+}
+
+.btn-explore:hover .arrow-icon {
+  transform: translateX(5px);
+}
+
+/* RESPONSIVE */
+
+/* Tablette */
+@media (max-width: 1024px) {
+  .destination-image {
+    height: 220px;
+  }
+
+  .destination-name {
+    font-size: var(--font-size-lg);
+  }
+
+  .price-value {
+    font-size: var(--font-size-xl);
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .destination-card {
+    max-width: 100%;
+  }
+
+  .destination-image {
+    height: 200px;
+  }
+
+  .destination-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .destination-rating {
+    align-self: flex-start;
+  }
+
+  .destination-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .btn-explore {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Très petit écran */
+@media (max-width: 480px) {
+  .destination-content {
+    padding: 1rem;
+  }
+
+  .destination-image {
+    height: 180px;
+  }
+
+  .destination-name {
+    font-size: var(--font-size-base);
+  }
+
+  .destination-description {
+    font-size: var(--font-size-xs);
+  }
+
+  .price-value {
+    font-size: var(--font-size-lg);
+  }
+}
+
+/* Animation d'entrée */
+@keyframes fadeInCard {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.destination-card {
+  animation: fadeInCard 0.5s ease-out forwards;
+}
+
+/* Délai d'animation pour effet cascade */
+.destination-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.destination-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.destination-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.destination-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.destination-card:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+.destination-card:nth-child(6) {
+  animation-delay: 0.6s;
+}

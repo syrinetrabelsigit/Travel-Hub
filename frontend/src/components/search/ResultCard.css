@@ -1,0 +1,351 @@
+.result-card {
+  background: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.result-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Flight Card Styles */
+.flight-card {
+  padding: var(--spacing-lg);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--bg-light);
+}
+
+.airline-info {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.airline-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: var(--border-radius);
+}
+
+.airline-name {
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-dark);
+  margin: 0;
+}
+
+.flight-number {
+  font-size: 0.9rem;
+  color: var(--neutral-color);
+  margin: 0;
+}
+
+.price-tag {
+  text-align: right;
+}
+
+.price {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+}
+
+.price-label {
+  font-size: 0.85rem;
+  color: var(--neutral-color);
+}
+
+.flight-details {
+  margin-bottom: var(--spacing-md);
+}
+
+.flight-segment {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.time-info {
+  text-align: center;
+}
+
+.time {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-dark);
+}
+
+.airport {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--neutral-color);
+  margin-top: 0.25rem;
+}
+
+.flight-duration {
+  text-align: center;
+}
+
+.duration-line {
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.duration-text {
+  font-size: 0.85rem;
+  color: var(--neutral-color);
+  background: var(--bg-white);
+  padding: 0 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--neutral-color);
+  z-index: 0;
+}
+
+.stops-info {
+  font-size: 0.85rem;
+  color: var(--neutral-color);
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--bg-light);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stars {
+  color: #FCD34D;
+}
+
+.rating-value {
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-dark);
+}
+
+.reviews-count {
+  font-size: 0.85rem;
+  color: var(--neutral-color);
+}
+
+.card-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+}
+
+.btn-secondary:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* Hotel Card Styles */
+.hotel-card {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--spacing-md);
+}
+
+.card-image {
+  position: relative;
+  height: 100%;
+  min-height: 200px;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badge-featured {
+  position: absolute;
+  top: var(--spacing-sm);
+  left: var(--spacing-sm);
+  background: var(--primary-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.card-content {
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.hotel-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.hotel-name {
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-dark);
+  margin: 0 0 0.5rem 0;
+}
+
+.hotel-location {
+  color: var(--neutral-color);
+  margin: 0 0 0.5rem 0;
+}
+
+.hotel-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.price-section {
+  text-align: right;
+}
+
+.amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.amenity-tag {
+  padding: 0.25rem 0.75rem;
+  background: var(--bg-light);
+  border-radius: var(--border-radius);
+  font-size: 0.85rem;
+  color: var(--neutral-color);
+}
+
+/* Activity Card Styles */
+.activity-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.category-badge {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background: var(--secondary-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.activity-title {
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-dark);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.activity-description {
+  color: var(--neutral-color);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.6;
+}
+
+.activity-info {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--bg-light);
+  border-radius: var(--border-radius);
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--neutral-color);
+  font-size: 0.9rem;
+}
+
+.info-item .icon {
+  font-size: 1.2rem;
+}
+
+.btn-full {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 968px) {
+  .hotel-card {
+    grid-template-columns: 1fr;
+  }
+
+  .flight-segment {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  .card-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .card-actions .btn {
+    width: 100%;
+  }
+}

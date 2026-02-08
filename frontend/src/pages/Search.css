@@ -1,0 +1,215 @@
+.search-page {
+  min-height: 100vh;
+  background: var(--bg-light);
+}
+
+/* SEARCH HERO - Style identique à About Hero */
+.search-hero {
+  background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+  padding: 5rem 0 3rem;
+  text-align: center;
+  color: var(--text-white);
+}
+
+.search-hero-title {
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 1rem;
+  color: var(--text-white);
+}
+
+.search-hero-subtitle {
+  font-size: var(--font-size-xl);
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-container {
+  margin-top: 1rem;
+  padding-bottom: var(--spacing-xl);
+}
+
+.search-card {
+  background: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.search-tabs {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 2px solid #E5E7EB;
+}
+
+.search-tab {
+  flex: 1;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--neutral-color);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: -2px;
+}
+
+.search-tab:hover {
+  color: var(--primary-color);
+  background: var(--bg-light);
+}
+
+.search-tab.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.tab-icon {
+  font-size: 1.5rem;
+}
+
+.search-form {
+  margin-top: var(--spacing-lg);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group-wide {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+  color: var(--primary-dark);
+  font-size: 0.9rem;
+}
+
+.form-input,
+.form-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #E5E7EB;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  font-family: var(--font-primary);
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+.form-select {
+  cursor: pointer;
+  background: white;
+}
+
+.btn-search {
+  width: 100%;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.search-benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
+}
+
+.benefit-item {
+  text-align: center;
+  padding: var(--spacing-lg);
+  background: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.benefit-item:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.benefit-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.benefit-title {
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-dark);
+  margin-bottom: var(--spacing-xs);
+}
+
+.benefit-text {
+  color: var(--neutral-color);
+  font-size: 0.95rem;
+}
+
+/* RESPONSIVE */
+
+/* Tablette et Mobile */
+@media (max-width: 768px) {
+  .search-hero {
+    padding: 3rem 0 2rem;
+  }
+
+  .search-hero-title {
+    font-size: var(--font-size-3xl);
+  }
+
+  .search-hero-subtitle {
+    font-size: var(--font-size-base);
+  }
+
+  .search-tabs {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .search-tab {
+    border-bottom: 1px solid #E5E7EB;
+    border-left: 3px solid transparent;
+  }
+
+  .search-tab.active {
+    border-bottom-color: #E5E7EB;
+    border-left-color: var(--primary-color);
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .search-card {
+    padding: var(--spacing-md);
+  }
+}

@@ -1,0 +1,22 @@
+# Node modules
+frontend/node_modules/
+
+# Backend
+backend/target/
+backend/.idea/
+backend/*.iml
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets (NE PAS COMMIT!)
+backend/src/main/resources/application.properties
+frontend/.env
