@@ -1,6 +1,5 @@
 import authService from './authService';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 
 class ApiService {
   async request(endpoint, options = {}) {
@@ -20,7 +19,7 @@ class ApiService {
     };
 
     try {
-      const response = await fetch(`${API_URL}${endpoint}`, config);
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
       // Si 401, essayer de rafraîchir le token
       if (response.status === 401 && token) {
@@ -29,7 +28,7 @@ class ApiService {
           // Réessayer la requête avec le nouveau token
           const newToken = authService.getToken();
           config.headers['Authorization'] = `Bearer ${newToken}`;
-          const retryResponse = await fetch(`${API_URL}${endpoint}`, config);
+          const retryResponse = await fetch(`${API_BASE_URL}${endpoint}`, config);
           
           if (!retryResponse.ok) {
             throw new Error(`HTTP error! status: ${retryResponse.status}`);

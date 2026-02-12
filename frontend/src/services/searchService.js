@@ -1,29 +1,24 @@
 import { apiService } from './api';
-import config from '../config/config';
 
 const searchService = {
   /**
    * Rechercher des vols
-   * Utilise AmadeusService en backend avec fallback automatique
    */
   searchFlights: async (searchParams) => {
     try {
       // Adapter les paramètres au format attendu par le backend
       const params = {
-        origin: searchParams.origin,
-        destination: searchParams.destination,
-        departureDate: searchParams.departureDate,
+        origin: searchParams.from || searchParams.origin,
+        destination: searchParams.to || searchParams.destination,
+        departureDate: searchParams.departDate || searchParams.departureDate,
         returnDate: searchParams.returnDate || null,
-        passengers: searchParams.passengers || 1,
-        cabinClass: searchParams.cabinClass || 'economy'
+        passengers: parseInt(searchParams.passengers) || 1,
+        cabinClass: searchParams.class || searchParams.cabinClass || 'economy'
       };
 
       console.log('🔍 Recherche de vols:', params);
 
-      const response = await apiService.post(
-        config.API_ENDPOINTS.FLIGHTS.SEARCH,
-        params
-      );
+      const response = await apiService.post('/search/flights', params);
 
       console.log('✅ Vols trouvés:', response.data);
       return response.data;
@@ -35,14 +30,11 @@ const searchService = {
   },
 
   /**
-   * Obtenir les détails d'un vol
+   * Obtenir les détails d'un vol par ID
    */
-  getFlightById: async (flightId) => {
+  getFlightDetails: async (flightId) => {
     try {
-      const response = await apiService.get(
-        config.API_ENDPOINTS.FLIGHTS.GET_BY_ID,
-        { id: flightId }
-      );
+      const response = await apiService.get(`/search/flight/${flightId}`);
       return response.data;
     } catch (error) {
       console.error('❌ Erreur détails vol:', error);
@@ -52,26 +44,22 @@ const searchService = {
 
   /**
    * Rechercher des hôtels
-   * Utilise AmadeusService en backend avec fallback automatique
    */
   searchHotels: async (searchParams) => {
     try {
       // Adapter les paramètres au format attendu par le backend
       const params = {
         destination: searchParams.destination,
-        checkInDate: searchParams.checkInDate,
-        checkOutDate: searchParams.checkOutDate,
-        rooms: searchParams.rooms || 1,
-        guests: searchParams.guests || 2,
-        minStars: searchParams.minStars || 0
+        checkInDate: searchParams.checkIn || searchParams.checkInDate,
+        checkOutDate: searchParams.checkOut || searchParams.checkOutDate,
+        rooms: parseInt(searchParams.rooms) || 1,
+        guests: parseInt(searchParams.guests) || 2,
+        minStars: parseInt(searchParams.minStars) || 0
       };
 
       console.log('🏨 Recherche d\'hôtels:', params);
 
-      const response = await apiService.post(
-        config.API_ENDPOINTS.HOTELS.SEARCH,
-        params
-      );
+      const response = await apiService.post('/search/hotels', params);
 
       console.log('✅ Hôtels trouvés:', response.data);
       return response.data;
@@ -83,14 +71,11 @@ const searchService = {
   },
 
   /**
-   * Obtenir les détails d'un hôtel
+   * Obtenir les détails d'un hôtel par ID
    */
-  getHotelById: async (hotelId) => {
+  getHotelDetails: async (hotelId) => {
     try {
-      const response = await apiService.get(
-        config.API_ENDPOINTS.HOTELS.GET_BY_ID,
-        { id: hotelId }
-      );
+      const response = await apiService.get(`/search/hotel/${hotelId}`);
       return response.data;
     } catch (error) {
       console.error('❌ Erreur détails hôtel:', error);
@@ -100,26 +85,20 @@ const searchService = {
 
   /**
    * Rechercher des activités
-   * Utilise FoursquareService en backend avec fallback automatique
    */
   searchActivities: async (searchParams) => {
     try {
       // Adapter les paramètres au format attendu par le backend
       const params = {
         destination: searchParams.destination,
-        category: searchParams.category || null,
-        startDate: searchParams.startDate || null,
-        endDate: searchParams.endDate || null,
-        minPrice: searchParams.minPrice || null,
-        maxPrice: searchParams.maxPrice || null
+        date: searchParams.date,
+        category: searchParams.category !== 'all' ? searchParams.category : null,
+        maxPrice: parseFloat(searchParams.maxPrice) || null
       };
 
       console.log('🎯 Recherche d\'activités:', params);
 
-      const response = await apiService.post(
-        config.API_ENDPOINTS.ACTIVITIES.SEARCH,
-        params
-      );
+      const response = await apiService.post('/search/activities', params);
 
       console.log('✅ Activités trouvées:', response.data);
       return response.data;
@@ -131,14 +110,11 @@ const searchService = {
   },
 
   /**
-   * Obtenir les détails d'une activité
+   * Obtenir les détails d'une activité par ID
    */
-  getActivityById: async (activityId) => {
+  getActivityDetails: async (activityId) => {
     try {
-      const response = await apiService.get(
-        config.API_ENDPOINTS.ACTIVITIES.GET_BY_ID,
-        { id: activityId }
-      );
+      const response = await apiService.get(`/search/activity/${activityId}`);
       return response.data;
     } catch (error) {
       console.error('❌ Erreur détails activité:', error);
@@ -168,8 +144,7 @@ const searchService = {
         }),
         searchService.searchActivities({
           destination: destination,
-          startDate: dates.start,
-          endDate: dates.end
+          date: dates.start
         })
       ]);
 

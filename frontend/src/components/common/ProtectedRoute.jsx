@@ -7,6 +7,8 @@ function ProtectedRoute({ children }) {
 
   if (!isAuthenticated) {
     // Rediriger vers la page de connexion
+    const currentPath = window.location.pathname;
+    localStorage.setItem('redirectAfterLogin', currentPath);
     return <Navigate to="/login" replace />;
   }
 

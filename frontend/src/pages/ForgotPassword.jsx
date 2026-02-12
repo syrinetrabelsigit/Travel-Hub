@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import authService from '../services/authService';
 import './ForgotPassword.css';
 
 function ForgotPassword() {
@@ -22,30 +23,21 @@ function ForgotPassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     const newErrors = validateEmail();
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
     setIsLoading(true);
+    setErrors({});
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email })
-      });
-
-      if (!response.ok) {
-        throw new Error('Erreur lors de l\'envoi de l\'email');
-      }
-
+      await authService.forgotPassword(email);
       setIsSuccess(true);
     } catch (error) {
+      console.error('Erreur forgot password:', error);
       setErrors({ submit: error.message || 'Une erreur est survenue' });
     } finally {
       setIsLoading(false);

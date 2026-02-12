@@ -90,35 +90,39 @@ function AdminUsers() {
 
   return (
     <div className="admin-users">
-      <div className="admin-container">
+      <div className="au-container">
         {/* Header */}
-        <div className="page-header">
-          <div>
-            <Link to="/admin" className="back-link">← Retour au Dashboard</Link>
-            <h1 className="page-title">Gestion des Utilisateurs</h1>
-            <p className="page-subtitle">{users.length} utilisateurs au total</p>
+        <div className="au-page-header">
+          <div className="au-header-content">
+            <Link to="/admin" className="au-back-link">← Retour au Dashboard</Link>
+            <h1 className="au-page-title">Gestion des Utilisateurs</h1>
+            <p className="au-page-subtitle">{users.length} utilisateurs au total</p>
+          </div>
+          <div className="au-header-stats">
+            <span>{users.length}</span>
+            <label>Utilisateurs</label>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="filters-bar">
-          <div className="search-box">
-            <span className="search-icon">🔍</span>
+        <div className="au-filters-bar">
+          <div className="au-search-box">
+            <span className="au-search-icon">🔍</span>
             <input
               type="text"
               placeholder="Rechercher par nom ou email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
+              className="au-search-input"
             />
           </div>
 
-          <div className="filter-group">
+          <div className="au-filter-group">
             <label>Rôle:</label>
             <select 
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
-              className="filter-select"
+              className="au-filter-select"
             >
               <option value="ALL">Tous</option>
               <option value="USER">Utilisateurs</option>
@@ -128,13 +132,13 @@ function AdminUsers() {
         </div>
 
         {/* Users Table */}
-        <div className="users-table-container">
+        <div className="au-table-container">
           {filteredUsers.length === 0 ? (
-            <div className="no-results">
+            <div className="au-no-results">
               <p>Aucun utilisateur trouvé</p>
             </div>
           ) : (
-            <table className="users-table">
+            <table className="au-users-table">
               <thead>
                 <tr>
                   <th>Utilisateur</th>
@@ -202,54 +206,56 @@ function AdminUsers() {
         </div>
       </div>
 
-      {/* User Detail Modal */}
-      {showModal && selectedUser && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Détails de l'utilisateur</h2>
-              <button onClick={closeModal} className="modal-close">×</button>
-            </div>
-            <div className="modal-body">
-              <div className="detail-group">
-                <label>Nom complet</label>
-                <p>{selectedUser.firstName} {selectedUser.lastName}</p>
+      {/* Modal avec classes au-* */}
+        {showModal && selectedUser && (
+          <div className="au-modal-overlay" onClick={closeModal}>
+            <div className="au-modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="au-modal-header">
+                <h2>Détails de l'utilisateur</h2>
+                <button onClick={closeModal} className="au-modal-close">×</button>
               </div>
-              <div className="detail-group">
-                <label>Email</label>
-                <p>{selectedUser.email}</p>
-              </div>
-              <div className="detail-group">
-                <label>Téléphone</label>
-                <p>{selectedUser.phone || 'Non renseigné'}</p>
-              </div>
-              <div className="detail-group">
-                <label>Date de naissance</label>
-                <p>{selectedUser.dateOfBirth || 'Non renseignée'}</p>
-              </div>
-              <div className="detail-group">
-                <label>Nationalité</label>
-                <p>{selectedUser.nationality || 'Non renseignée'}</p>
-              </div>
-              <div className="detail-group">
-                <label>Rôle</label>
-                <p className={`role-badge ${selectedUser.role.toLowerCase()}`}>
-                  {selectedUser.role}
-                </p>
-              </div>
-              <div className="detail-group">
-                <label>Date d'inscription</label>
-                <p>
-                  {selectedUser.createdAt 
-                    ? new Date(selectedUser.createdAt).toLocaleString('fr-FR')
-                    : 'N/A'
-                  }
-                </p>
+              <div className="au-modal-body">
+                <div className="au-detail-group">
+                  <label>Nom complet</label>
+                  <p>{selectedUser.firstName} {selectedUser.lastName}</p>
+                </div>
+                <div className="au-detail-group">
+                  <label>Email</label>
+                  <p>{selectedUser.email}</p>
+                </div>
+                <div className="au-detail-group">
+                  <label>Téléphone</label>
+                  <p>{selectedUser.phone || 'Non renseigné'}</p>
+                </div>
+                <div className="au-detail-group">
+                  <label>Date de naissance</label>
+                  <p>{selectedUser.dateOfBirth || 'Non renseignée'}</p>
+                </div>
+                <div className="au-detail-group">
+                  <label>Nationalité</label>
+                  <p>{selectedUser.nationality || 'Non renseignée'}</p>
+                </div>
+                <div className="au-detail-group">
+                  <label>Rôle</label>
+                  <p>
+                    <span className={`au-role-badge ${selectedUser.role?.toLowerCase()}`}>
+                      {selectedUser.role}
+                    </span>
+                  </p>
+                </div>
+                <div className="au-detail-group">
+                  <label>Date d'inscription</label>
+                  <p>
+                    {selectedUser.createdAt 
+                      ? new Date(selectedUser.createdAt).toLocaleString('fr-FR')
+                      : 'N/A'
+                    }
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 }

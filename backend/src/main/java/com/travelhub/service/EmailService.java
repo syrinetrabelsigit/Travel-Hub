@@ -5,10 +5,14 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import com.travelhub.model.User;
+import com.travelhub.repository.UserRepository;
 
+import java.util.UUID;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -17,8 +21,15 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Value("${email.from}")
     private String fromEmail;
+
+    // ❌ SUPPRIMER CETTE LIGNE (auto-injection récursive)
+    // @Autowired
+    // private EmailService emailService;
 
     public void sendBookingConfirmation(Booking booking, String userEmail) {
         try {
@@ -117,6 +128,74 @@ public class EmailService {
                 "<p>Votre réservation <strong>" + booking.getBookingReference() + "</strong> a été annulée.</p>" +
                 "<p>Si vous avez des questions, contactez notre support.</p>" +
                 "<p>Cordialement,<br>L'équipe TravelHub</p>" +
+                "</div></body></html>";
+    }
+
+    public void sendPasswordResetEmail(String toEmail, String resetToken) {
+        System.out.println("=== DÉBUT ENVOI EMAIL RESET ===");
+        System.out.println("Destinataire: " + toEmail);
+        System.out.println("Token: " + resetToken);
+        System.out.println("From email: " + fromEmail);
+
+        try {
+            String resetUrl = "http://localhost:3000/reset-password?token=" + resetToken;
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("Réinitialisation de votre mot de passe - TravelHub");
+
+            String htmlContent = buildPasswordResetEmail(resetUrl);
+            helper.setText(htmlContent, true);
+
+            System.out.println("✅ Tentative d'envoi...");
+            mailSender.send(message);
+            System.out.println("✅ Email de réinitialisation envoyé avec succès à : " + toEmail);
+
+        } catch (MessagingException e) {
+            System.err.println("❌ Erreur MessagingException : " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de l'envoi de l'email");
+        } catch (Exception e) {
+            System.err.println("❌ Erreur inattendue : " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de l'envoi de l'email");
+        }
+
+        System.out.println("=== FIN ENVOI EMAIL RESET ===");
+    }
+
+    private String buildPasswordResetEmail(String resetUrl) {
+        return "<!DOCTYPE html><html><head><style>" +
+                "body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }" +
+                ".container { max-width: 600px; margin: 0 auto; padding: 20px; }" +
+                ".header { background-color: #007bff; color: white; padding: 20px; text-align: center; }" +
+                ".content { padding: 20px; background-color: #f9f9f9; }" +
+                ".button { display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }" +
+                ".footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }" +
+                "</style></head><body>" +
+                "<div class='container'>" +
+                "<div class='header'><h1>TravelHub</h1></div>" +
+                "<div class='content'>" +
+                "<h2>Réinitialisation de mot de passe</h2>" +
+                "<p>Bonjour,</p>" +
+                "<p>Vous avez demandé à réinitialiser votre mot de passe.</p>" +
+                "<p>Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :</p>" +
+                "<p style='text-align: center;'>" +
+                "<a href='" + resetUrl + "' class='button'>Réinitialiser mon mot de passe</a>" +
+                "</p>" +
+                "<p>Ou copiez ce lien dans votre navigateur :</p>" +
+                "<p style='word-break: break-all; color: #007bff;'>" + resetUrl + "</p>" +
+                "<p><strong>Ce lien est valable pendant 24 heures.</strong></p>" +
+                "<p>Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.</p>" +
+                "<p>Cordialement,<br>L'équipe TravelHub</p>" +
+                "</div>" +
+                "<div class='footer'>" +
+                "<p>TravelHub - Votre partenaire voyage</p>" +
+                "<p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>" +
+                "</div>" +
                 "</div></body></html>";
     }
 }

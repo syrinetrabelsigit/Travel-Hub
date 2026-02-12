@@ -14,6 +14,8 @@ public class CartItem {
 
     // Constructeurs
     public CartItem() {
+        this.quantity = 1; // ✅ Initialiser ici aussi
+        this.addedAt = LocalDateTime.now(); // ✅ Initialiser automatiquement
     }
 
     // Getters et Setters

@@ -1,70 +1,77 @@
-import { apiService } from './api';
-import config from '../config/config';
+import apiService from './apiService';
 
 const bookingService = {
-  // Récupérer toutes les réservations
-  getBookings: async (filters = {}) => {
+  // Créer une réservation (depuis le panier)
+  async createBooking() {
     try {
-      const response = await apiService.get(config.API_ENDPOINTS.BOOKINGS.LIST, {
-        params: filters
-      });
-      return response.data;
+      const response = await apiService.post('/bookings');
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur createBooking:', error);
+      throw error;
     }
   },
 
-  // Récupérer une réservation par ID
-  getBookingById: async (id) => {
+  // Obtenir une réservation par ID
+  async getBooking(id) {
     try {
-      const response = await apiService.get(
-        config.API_ENDPOINTS.BOOKINGS.GET_BY_ID,
-        { id }
-      );
-      return response.data;
+      const response = await apiService.get(`/bookings/${id}`);
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur getBooking:', error);
+      throw error;
     }
   },
 
-  // Créer une réservation
-  createBooking: async (bookingData) => {
+  // Obtenir toutes les réservations de l'utilisateur
+  async getUserBookings() {
     try {
-      const response = await apiService.post(
-        config.API_ENDPOINTS.BOOKINGS.CREATE,
-        bookingData
-      );
-      return response.data;
+      const response = await apiService.get('/bookings');
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur getUserBookings:', error);
+      throw error;
     }
   },
 
   // Annuler une réservation
-  cancelBooking: async (id) => {
+  async cancelBooking(id) {
     try {
-      const response = await apiService.post(
-        config.API_ENDPOINTS.BOOKINGS.CANCEL,
-        {},
-        { id }
-      );
-      return response.data;
+      const response = await apiService.put(`/bookings/${id}/cancel`);
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur cancelBooking:', error);
+      throw error;
     }
   },
 
-  // Modifier une réservation
-  updateBooking: async (id, updateData) => {
+  // Télécharger la facture PDF
+  async downloadInvoice(id) {
     try {
-      const response = await apiService.put(
-        config.API_ENDPOINTS.BOOKINGS.UPDATE,
-        updateData,
-        { id }
-      );
-      return response.data;
+      const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api'}/bookings/${id}/invoice`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors du téléchargement de la facture');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `facture-${id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur downloadInvoice:', error);
+      throw error;
     }
   }
 };

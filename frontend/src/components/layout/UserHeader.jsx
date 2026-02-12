@@ -1,26 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
+import cartService from '../../services/cartService';
 import './Header.css';
 
 function UserHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [cartItemCount, setCartItemCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
     setUser(currentUser);
+    
+    // Charger le nombre d'articles dans le panier
+    if (currentUser) {
+      loadCartCount();
+    }
   }, []);
+
+  // Recharger le compteur du panier quand on change de page
+  useEffect(() => {
+    if (user) {
+      loadCartCount();
+    }
+  }, [location.pathname, user]);
+
+  const loadCartCount = async () => {
+    try {
+      const cart = await cartService.getCart();
+      const totalItems = cart.items ? cart.items.length : 0;
+      setCartItemCount(totalItems);
+    } catch (error) {
+      console.error('Erreur chargement panier:', error);
+      setCartItemCount(0);
+    }
+  };
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const closeMenu = () => setMenuOpen(false);
+  
   const handleLogout = () => {
     authService.logout();
+    setUser(null);
+    setCartItemCount(0);
     closeMenu();
     navigate('/');
   };
+  
   const isActive = (path) => (location.pathname === path ? 'active' : '');
 
   return (
@@ -35,17 +64,36 @@ function UserHeader() {
 
           {/* Navigation */}
           <nav className={`navigation ${menuOpen ? 'open' : ''}`}>
-            <Link to="/" className={`nav-link ${isActive('/')}`} onClick={closeMenu}>Accueil</Link>
-            <Link to="/about" className={`nav-link ${isActive('/about')}`} onClick={closeMenu}>À propos</Link>
-            <Link to="/contact" className={`nav-link ${isActive('/contact')}`} onClick={closeMenu}>Contact</Link>
+            <Link to="/" className={`nav-link ${isActive('/')}`} onClick={closeMenu}>
+              Accueil
+            </Link>
+            <Link to="/search" className={`nav-link ${isActive('/search')}`} onClick={closeMenu}>
+              Rechercher
+            </Link>
+            <Link to="/about" className={`nav-link ${isActive('/about')}`} onClick={closeMenu}>
+              À propos
+            </Link>
+            <Link to="/contact" className={`nav-link ${isActive('/contact')}`} onClick={closeMenu}>
+              Contact
+            </Link>
 
             {/* Mobile links */}
             <div className="mobile-only-links">
-              <Link to="/profile" className={`nav-link ${isActive('/profile')}`} onClick={closeMenu}>👤 Mon Profil</Link>
-              <Link to="/booking-history" className={`nav-link ${isActive('/booking-history')}`} onClick={closeMenu}>📅 Mes Réservations</Link>
-              <Link to="/preferences" className={`nav-link ${isActive('/preferences')}`} onClick={closeMenu}>⚙️ Préférences</Link>
-              <Link to="/cart" className={`nav-link ${isActive('/cart')}`} onClick={closeMenu}>🛒 Panier</Link>
-              <button onClick={handleLogout} className="nav-link logout-link">🚪 Déconnexion</button>
+              <Link to="/profile" className={`nav-link ${isActive('/profile')}`} onClick={closeMenu}>
+                👤 Mon Profil
+              </Link>
+              <Link to="/booking-history" className={`nav-link ${isActive('/booking-history')}`} onClick={closeMenu}>
+                📅 Mes Réservations
+              </Link>
+              <Link to="/preferences" className={`nav-link ${isActive('/preferences')}`} onClick={closeMenu}>
+                ⚙️ Préférences
+              </Link>
+              <Link to="/cart" className={`nav-link ${isActive('/cart')}`} onClick={closeMenu}>
+                🛒 Panier
+              </Link>
+              <button onClick={handleLogout} className="nav-link logout-link">
+                🚪 Déconnexion
+              </button>
             </div>
           </nav>
 
@@ -57,31 +105,47 @@ function UserHeader() {
 
             <Link to="/cart" className="btn-cart">
               <span className="cart-icon">🛒</span>
-              <span className="cart-badge">0</span>
+              {cartItemCount > 0 && (
+                <span className="cart-badge">{cartItemCount}</span>
+              )}
             </Link>
 
             {/* Profile dropdown */}
             <div className="user-dropdown">
               <button className="btn-profile-user">
                 <span className="profile-icon">👤</span>
-                <span className="user-name">{user?.firstName}</span>
+                <span className="user-name">{user?.firstName || 'Utilisateur'}</span>
               </button>
               <div className="dropdown-menu">
                 <div className="dropdown-header">
-                  <p className="dropdown-user-name">{user?.firstName} {user?.lastName}</p>
+                  <p className="dropdown-user-name">
+                    {user?.firstName} {user?.lastName}
+                  </p>
                   <p className="dropdown-user-email">{user?.email}</p>
                 </div>
                 <div className="dropdown-divider"></div>
-                <Link to="/profile" className="dropdown-item" onClick={closeMenu}>👤 Mon Profil</Link>
-                <Link to="/booking-history" className="dropdown-item" onClick={closeMenu}>📅 Mes Réservations</Link>
-                <Link to="/preferences" className="dropdown-item" onClick={closeMenu}>⚙️ Préférences</Link>
+                <Link to="/profile" className="dropdown-item" onClick={closeMenu}>
+                  👤 Mon Profil
+                </Link>
+                <Link to="/booking-history" className="dropdown-item" onClick={closeMenu}>
+                  📅 Mes Réservations
+                </Link>
+                <Link to="/preferences" className="dropdown-item" onClick={closeMenu}>
+                  ⚙️ Préférences
+                </Link>
                 <div className="dropdown-divider"></div>
-                <button onClick={handleLogout} className="dropdown-item dropdown-item-logout">🚪 Déconnexion</button>
+                <button onClick={handleLogout} className="dropdown-item dropdown-item-logout">
+                  🚪 Déconnexion
+                </button>
               </div>
             </div>
 
             {/* Mobile burger menu */}
-            <button className={`menu-toggle ${menuOpen ? 'open' : ''}`} onClick={toggleMenu} aria-label="Toggle menu">
+            <button 
+              className={`menu-toggle ${menuOpen ? 'open' : ''}`} 
+              onClick={toggleMenu} 
+              aria-label="Toggle menu"
+            >
               <span></span>
               <span></span>
               <span></span>

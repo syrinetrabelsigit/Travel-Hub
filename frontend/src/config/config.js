@@ -3,6 +3,9 @@ const config = {
   // URL de l'API Backend (Spring Boot)
   API_BASE_URL: process.env.REACT_APP_API_URL || 'http://localhost:8080/api',
   
+  // AJOUT : Clé publique Stripe
+  STRIPE_PUBLIC_KEY: process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_51SyehhIp57yGvBCs1ryn1Z9unOJaGfhsPeybBdOsn594S9d240WwTDWpdtOqrglVbBnwenNeI9lXQ7lQ2GpBQWYp006kvB0Rt3',
+
   // Endpoints API
   API_ENDPOINTS: {
     AUTH: {

@@ -1,136 +1,115 @@
 import React, { useState } from 'react';
-import './AddReviewForm.css';
 import reviewService from '../../services/reviewService';
-import authService from '../../services/authService';
+import './AddReviewForm.css';
 
 function AddReviewForm({ itemType, itemId, onReviewAdded, onCancel }) {
-  const [rating, setRating] = useState(0);
-  const [hoveredRating, setHoveredRating] = useState(0);
+  const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (rating === 0) {
-      setError('Veuillez sélectionner une note');
-      return;
-    }
 
     if (!comment.trim()) {
-      setError('Veuillez écrire un commentaire');
+      setError('Veuillez ajouter un commentaire');
       return;
     }
 
-    setIsSubmitting(true);
-    setError('');
+    if (comment.length < 10) {
+      setError('Le commentaire doit contenir au moins 10 caractères');
+      return;
+    }
 
     try {
-      const user = authService.getCurrentUser();
-      const reviewData = {
-        itemType,
-        itemId,
-        rating,
-        comment: comment.trim(),
-        author: user ? `${user.firstName} ${user.lastName}` : 'Anonyme',
-        authorEmail: user?.email || '',
-        date: new Date().toISOString()
-      };
+      setIsSubmitting(true);
+      setError(null);
 
-      const newReview = await reviewService.createReview(reviewData);
-      onReviewAdded(newReview);
+      const newReview = await reviewService.createReview({
+        itemType: itemType,
+        itemId: itemId,
+        rating: rating,
+        comment: comment.trim()
+      });
+
+      alert('✅ Avis publié avec succès !');
       
-      // Réinitialiser le formulaire
-      setRating(0);
+      if (onReviewAdded) {
+        onReviewAdded(newReview);
+      }
+
+      setRating(5);
       setComment('');
     } catch (error) {
-      setError(error.message || 'Erreur lors de l\'envoi de l\'avis');
+      console.error('Erreur création avis:', error);
+      setError(error.message || 'Erreur lors de la publication de l\'avis');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="add-review-form">
-      <div className="form-header">
-        <h3 className="form-title">Partagez votre expérience</h3>
-        <p className="form-subtitle">Votre avis aidera d'autres voyageurs</p>
-      </div>
-
-      <form onSubmit={handleSubmit}>
+    <div className="arf-container">
+      <h3 className="arf-title">Laisser un avis</h3>
+      
+      <form onSubmit={handleSubmit} className="arf-form">
         {error && (
-          <div className="alert alert-error">
-            <span className="alert-icon">⚠️</span>
+          <div className="arf-alert arf-alert-error">
             {error}
           </div>
         )}
 
-        {/* Sélection de la note */}
-        <div className="rating-section">
-          <label className="section-label">Votre note</label>
-          <div className="star-rating">
-            {[1, 2, 3, 4, 5].map((star) => (
+        <div className="arf-group">
+          <label className="arf-label">
+            Note *
+          </label>
+          <div className="arf-rating-container">
+            {[1, 2, 3, 4, 5].map(star => (
               <button
                 key={star}
                 type="button"
-                className={`star-button ${star <= (hoveredRating || rating) ? 'active' : ''}`}
                 onClick={() => setRating(star)}
-                onMouseEnter={() => setHoveredRating(star)}
-                onMouseLeave={() => setHoveredRating(0)}
+                className={`arf-star-btn ${star <= rating ? 'active' : ''}`}
               >
-                <span className="star-icon">
-                  {star <= (hoveredRating || rating) ? '⭐' : '☆'}
-                </span>
+                ⭐
               </button>
             ))}
+            <span className="arf-rating-text">{rating}/5</span>
           </div>
-          {rating > 0 && (
-            <div className="rating-label">
-              {rating === 5 ? 'Excellent' : 
-               rating === 4 ? 'Très bien' : 
-               rating === 3 ? 'Bien' : 
-               rating === 2 ? 'Moyen' : 
-               'Décevant'}
-            </div>
-          )}
         </div>
 
-        {/* Commentaire */}
-        <div className="comment-section">
-          <label htmlFor="comment" className="section-label">
-            Votre avis
+        <div className="arf-group">
+          <label className="arf-label">
+            Commentaire *
+            <span className="arf-char-count">({comment.length}/1000)</span>
           </label>
           <textarea
-            id="comment"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            className="comment-textarea"
-            placeholder="Décrivez votre expérience... Qu'avez-vous aimé ? Qu'est-ce qui pourrait être amélioré ?"
-            rows="6"
+            placeholder="Partagez votre expérience..."
+            className="arf-textarea"
+            rows="5"
             maxLength="1000"
+            required
           />
-          <div className="character-count">
-            {comment.length} / 1000 caractères
-          </div>
+          <small className="arf-hint">Minimum 10 caractères</small>
         </div>
 
-        {/* Actions */}
-        <div className="form-actions">
-          <button 
-            type="button" 
-            onClick={onCancel} 
-            className="btn btn-secondary"
+        <div className="arf-actions">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="arf-btn arf-btn-secondary"
             disabled={isSubmitting}
           >
             Annuler
           </button>
-          <button 
-            type="submit" 
-            className="btn btn-primary"
-            disabled={isSubmitting}
+          <button
+            type="submit"
+            className="arf-btn arf-btn-primary"
+            disabled={isSubmitting || !comment.trim()}
           >
-            {isSubmitting ? 'Envoi en cours...' : 'Publier mon avis'}
+            {isSubmitting ? 'Publication...' : 'Publier l\'avis'}
           </button>
         </div>
       </form>

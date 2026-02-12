@@ -24,7 +24,7 @@ public class UserController {
     ) {
         try {
             String token = authHeader.replace("Bearer ", "");
-            User user = userService.getCurrentUser(token);
+            User user = userService.getCurrentUser();
             user.setPassword(null);
             return ResponseEntity.ok(user);
         } catch (Exception e) {

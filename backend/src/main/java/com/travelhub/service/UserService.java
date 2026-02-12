@@ -3,9 +3,9 @@ package com.travelhub.service;
 import com.travelhub.model.User;
 import com.travelhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.security.core.Authentication;
-// import org.springframework.security.core.context.SecurityContextHolder;
-// import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,31 +22,24 @@ public class UserService {
     // @Autowired
     // private PasswordEncoder passwordEncoder;
 
-    public User getCurrentUser(String token) {
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
+    public User getCurrentUser() {
+        // Récupérer l'authentification depuis le contexte de sécurité
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("Utilisateur non authentifié");
         }
 
-        if (!jwtService.validateToken(token)) {
-            throw new RuntimeException("Token invalide");
-        }
-
-        String email = jwtService.extractUserId(token); // email depuis JWT
+        // Le principal contient l'email de l'utilisateur (configuré dans JwtAuthFilter)
+        String email = authentication.getName();
 
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
     }
 
 
-    public User getCurrentUser() {
-        throw new RuntimeException(
-                "getCurrentUser() sans token n'est plus autorisé. Passe le token depuis le controller."
-        );
-    }
-
-
     public User updateProfile(String token, User updatedUser) {
-        User user = getCurrentUser(token);
+        User user = getCurrentUser();
 
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
@@ -61,7 +54,7 @@ public class UserService {
     }
 
     public void changePassword(String token, String currentPassword, String newPassword) {
-        User user = getCurrentUser(token);
+        User user = getCurrentUser();
 
         // TEMPORAIRE (simple)
         user.setPassword(newPassword);

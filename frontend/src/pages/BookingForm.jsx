@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './BookingForm.css';
 import bookingService from '../services/bookingService';
-import PaymentForm from '../components/booking/PaymentForm';
+import cartService from '../services/cartService';
+import StripeWrapper from '../components/booking/StripeWrapper';
+import StripePaymentForm from '../components/booking/StripePaymentForm';
 
 function BookingForm() {
   const { type, id } = useParams();
@@ -10,6 +12,7 @@ function BookingForm() {
   const location = useLocation();
   const [step, setStep] = useState(1); // 1: Info, 2: Paiement, 3: Confirmation
   const [isLoading, setIsLoading] = useState(false);
+  const [bookingId, setBookingId] = useState(null);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -43,7 +46,7 @@ function BookingForm() {
       }));
     }
 
-    // Récupérer les détails de l'item depuis le state ou localStorage
+    // Récupérer les détails de l'item depuis le state
     const stateData = location.state;
     if (stateData) {
       setItemDetails(stateData);
@@ -77,14 +80,39 @@ function BookingForm() {
     return newErrors;
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (step === 1) {
       const newErrors = validateStep1();
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
         return;
       }
-      setStep(2);
+
+      setIsLoading(true);
+      try {
+        // Ajouter l'item au panier si ce n'est pas déjà fait
+        const cartItem = {
+          type: type.slice(0, -1), // "flights" -> "flight"
+          itemId: id,
+          data: itemDetails,
+          price: itemDetails?.price || 0,
+          quantity: 1,
+          addedAt: new Date().toISOString()
+        };
+        
+        await cartService.addItem(cartItem);
+
+        // Créer la réservation (le backend récupère automatiquement le panier)
+        const booking = await bookingService.createBooking();
+        setBookingId(booking.id);
+        
+        setStep(2);
+      } catch (error) {
+        console.error('Erreur:', error);
+        setErrors({ submit: error.message || 'Erreur lors de la création de la réservation' });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -94,31 +122,9 @@ function BookingForm() {
     }
   };
 
-  const handlePaymentSuccess = async (paymentMethod) => {
-    setIsLoading(true);
-
-    try {
-      const bookingData = {
-        type,
-        itemId: id,
-        ...formData,
-        paymentMethod: paymentMethod.id,
-        ...itemDetails
-      };
-
-      const booking = await bookingService.createBooking(bookingData);
-      
-      // Vider le panier si l'item venait du panier
-      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      const newCart = cart.filter(item => !(item.id === id && item.type === type));
-      localStorage.setItem('cart', JSON.stringify(newCart));
-
-      navigate(`/booking/confirmation/${booking.id}`);
-    } catch (error) {
-      alert('Erreur lors de la réservation: ' + error.message);
-    } finally {
-      setIsLoading(false);
-    }
+  const handlePaymentSuccess = async (paymentResponse) => {
+    console.log('✅ Paiement réussi, redirection...');
+    navigate(`/booking/confirmation/${bookingId}`);
   };
 
   const getItemTypeLabel = () => {
@@ -133,7 +139,7 @@ function BookingForm() {
   return (
     <div className="booking-form-page">
       <div className="container">
-        {/* Fil d'Ariane / Stepper */}
+        {/* Stepper */}
         <div className="booking-stepper">
           <div className={`step ${step >= 1 ? 'active' : ''} ${step > 1 ? 'completed' : ''}`}>
             <div className="step-number">1</div>
@@ -330,25 +336,29 @@ function BookingForm() {
                       type="button" 
                       onClick={handleNextStep} 
                       className="btn btn-primary"
+                      disabled={isLoading}
                     >
-                      Continuer vers le paiement
+                      {isLoading ? 'Chargement...' : 'Continuer vers le paiement'}
                     </button>
                   </div>
                 </form>
               )}
 
               {/* Étape 2: Paiement */}
-              {step === 2 && (
+              {step === 2 && bookingId && (
                 <div className="payment-step">
                   <h2 className="section-title">Paiement sécurisé</h2>
                   <p className="payment-info">
-                    Vos informations de paiement sont sécurisées et cryptées
+                    Vos informations de paiement sont sécurisées et cryptées par Stripe
                   </p>
 
-                  <PaymentForm 
-                    amount={itemDetails?.price || 0}
-                    onSuccess={handlePaymentSuccess}
-                  />
+                  <StripeWrapper>
+                    <StripePaymentForm 
+                      amount={itemDetails?.price || 0}
+                      bookingId={bookingId}
+                      onSuccess={handlePaymentSuccess}
+                    />
+                  </StripeWrapper>
 
                   <div className="form-actions">
                     <button 
@@ -392,7 +402,7 @@ function BookingForm() {
 
               <div className="summary-total">
                 <span className="total-label">Total</span>
-                <span className="total-amount">{itemDetails?.price || 0} DT</span>
+                <span className="total-amount">{itemDetails?.price || 0} €</span>
               </div>
 
               <div className="summary-features">

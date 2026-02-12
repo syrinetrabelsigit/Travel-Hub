@@ -9,9 +9,18 @@ import java.util.Optional;
 @Repository
 public interface UserPreferencesRepository extends MongoRepository<UserPreferences, String> {
 
-    // Trouver les préférences d'un utilisateur
+    /**
+     * Trouver les préférences par user ID
+     */
     Optional<UserPreferences> findByUserId(String userId);
 
-    // Supprimer les préférences d'un utilisateur
+    /**
+     * Vérifier si des préférences existent pour un user
+     */
+    boolean existsByUserId(String userId);
+
+    /**
+     * Supprimer les préférences d'un user
+     */
     void deleteByUserId(String userId);
 }

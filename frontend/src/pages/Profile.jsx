@@ -226,8 +226,8 @@ function Profile() {
     return (
       <div className="profile-page">
         <div className="container">
-          <div className="loading-spinner">
-            <div className="spinner"></div>
+          <div className="pp-loading-spinner">
+            <div className="pp-spinner"></div>
             <p>Chargement de votre profil...</p>
           </div>
         </div>

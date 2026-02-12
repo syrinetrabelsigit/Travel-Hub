@@ -1,78 +1,69 @@
-import { apiService } from './api';
-import config from '../config/config';
+import apiService from './apiService';
 
 const reviewService = {
-  // Obtenir les avis d'un élément
-  getReviews: async (itemType, itemId) => {
+  // Récupérer les avis d'un item
+  async getReviews(itemType, itemId) {
     try {
-      const response = await apiService.get(
-        config.API_ENDPOINTS.REVIEWS.GET_BY_ITEM,
-        { itemType, itemId }
-      );
-      return response.data;
+      const response = await apiService.get(`/reviews/${itemType}/${itemId}`);
+      return response.reviews || [];
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur getReviews:', error);
+      throw error;
     }
   },
 
-  // Obtenir les avis de l'utilisateur
-  getUserReviews: async () => {
+  // Récupérer mes avis
+  async getMyReviews() {
     try {
-      const response = await apiService.get(config.API_ENDPOINTS.REVIEWS.GET_USER_REVIEWS);
-      return response.data;
+      const response = await apiService.get('/reviews/my-reviews');
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur getMyReviews:', error);
+      throw error;
     }
   },
 
   // Créer un avis
-  createReview: async (reviewData) => {
+  async createReview(reviewData) {
     try {
-      const response = await apiService.post(config.API_ENDPOINTS.REVIEWS.CREATE, reviewData);
-      return response.data;
+      const response = await apiService.post('/reviews', reviewData);
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur createReview:', error);
+      throw error;
     }
   },
 
   // Mettre à jour un avis
-  updateReview: async (id, reviewData) => {
+  async updateReview(reviewId, reviewData) {
     try {
-      const response = await apiService.put(
-        config.API_ENDPOINTS.REVIEWS.UPDATE,
-        reviewData,
-        { id }
-      );
-      return response.data;
+      const response = await apiService.put(`/reviews/${reviewId}`, reviewData);
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur updateReview:', error);
+      throw error;
     }
   },
 
   // Supprimer un avis
-  deleteReview: async (id) => {
+  async deleteReview(reviewId) {
     try {
-      const response = await apiService.delete(
-        config.API_ENDPOINTS.REVIEWS.DELETE,
-        { id }
-      );
-      return response.data;
+      const response = await apiService.delete(`/reviews/${reviewId}`);
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur deleteReview:', error);
+      throw error;
     }
   },
 
-  // Voter pour un avis
-  voteReview: async (id, helpful) => {
+  // Voter helpful/not helpful
+  async voteHelpful(reviewId, helpful) {
     try {
-      const response = await apiService.post(
-        config.API_ENDPOINTS.REVIEWS.VOTE,
-        { helpful },
-        { id }
-      );
-      return response.data;
+      const response = await apiService.post(`/reviews/${reviewId}/vote`, { helpful });
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur voteHelpful:', error);
+      throw error;
     }
   }
 };

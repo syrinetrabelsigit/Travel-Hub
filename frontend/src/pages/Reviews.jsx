@@ -89,7 +89,7 @@ function Reviews() {
     }
   };
 
-  if (isLoading) {
+   if (isLoading) {
     return <LoadingSpinner text="Chargement des avis..." />;
   }
 
@@ -98,17 +98,17 @@ function Reviews() {
   const averageRating = getAverageRating();
 
   return (
-    <div className="reviews-page">
-      <div className="container">
+    <div className="rv-page">
+      <div className="rv-container">
         {/* En-tête */}
-        <div className="reviews-header">
-          <button onClick={() => navigate(-1)} className="back-button">
+        <div className="rv-header">
+          <button onClick={() => navigate(-1)} className="rv-back-btn">
             ← Retour
           </button>
-          <h1 className="reviews-title">Avis clients</h1>
+          <h1 className="rv-title">Avis clients</h1>
           <button 
             onClick={() => setShowAddForm(!showAddForm)} 
-            className="btn btn-primary"
+            className="rv-btn rv-btn-primary"
           >
             {showAddForm ? 'Annuler' : '✍️ Laisser un avis'}
           </button>
@@ -116,7 +116,7 @@ function Reviews() {
 
         {/* Formulaire d'ajout d'avis */}
         {showAddForm && (
-          <div className="add-review-section">
+          <div className="rv-add-section">
             <AddReviewForm 
               itemType={type}
               itemId={id}
@@ -126,50 +126,50 @@ function Reviews() {
           </div>
         )}
 
-        <div className="reviews-content">
+        <div className="rv-content">
           {/* Sidebar - Statistiques */}
-          <aside className="reviews-sidebar">
-            <div className="stats-card">
-              <h3 className="stats-title">Note globale</h3>
-              <div className="overall-rating">
-                <div className="rating-number">{averageRating}</div>
-                <div className="rating-stars">
+          <aside className="rv-sidebar">
+            <div className="rv-stats-card">
+              <h3 className="rv-stats-title">Note globale</h3>
+              <div className="rv-overall-rating">
+                <div className="rv-rating-number">{averageRating}</div>
+                <div className="rv-rating-stars">
                   {'⭐'.repeat(Math.floor(averageRating))}
                 </div>
-                <div className="rating-count">{reviews.length} avis</div>
+                <div className="rv-rating-count">{reviews.length} avis</div>
               </div>
 
-              <div className="rating-distribution">
+              <div className="rv-distribution">
                 <h4>Répartition des notes</h4>
                 {[5, 4, 3, 2, 1].map(rating => (
-                  <div key={rating} className="distribution-row">
-                    <span className="distribution-label">
-                      {rating} <span className="star-icon">⭐</span>
+                  <div key={rating} className="rv-distribution-row">
+                    <span className="rv-distribution-label">
+                      {rating} <span className="rv-star-icon">⭐</span>
                     </span>
-                    <div className="distribution-bar">
+                    <div className="rv-distribution-bar">
                       <div 
-                        className="distribution-fill" 
+                        className="rv-distribution-fill" 
                         style={{
                           width: `${reviews.length > 0 ? (distribution[rating] / reviews.length) * 100 : 0}%`
                         }}
                       ></div>
                     </div>
-                    <span className="distribution-count">{distribution[rating]}</span>
+                    <span className="rv-distribution-count">{distribution[rating]}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Filtres */}
-            <div className="filters-card">
-              <h3 className="filters-title">Filtrer les avis</h3>
+            <div className="rv-filters-card">
+              <h3 className="rv-filters-title">Filtrer les avis</h3>
               
-              <div className="filter-group">
-                <label className="filter-label">Note minimale</label>
+              <div className="rv-filter-group">
+                <label className="rv-filter-label">Note minimale</label>
                 <select 
                   value={filterRating} 
                   onChange={(e) => setFilterRating(Number(e.target.value))}
-                  className="filter-select"
+                  className="rv-filter-select"
                 >
                   <option value="0">Tous les avis</option>
                   <option value="5">5 étoiles</option>
@@ -180,12 +180,12 @@ function Reviews() {
                 </select>
               </div>
 
-              <div className="filter-group">
-                <label className="filter-label">Trier par</label>
+              <div className="rv-filter-group">
+                <label className="rv-filter-label">Trier par</label>
                 <select 
                   value={sortBy} 
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="filter-select"
+                  className="rv-filter-select"
                 >
                   <option value="recent">Plus récents</option>
                   <option value="highest">Note la plus élevée</option>
@@ -196,16 +196,16 @@ function Reviews() {
           </aside>
 
           {/* Liste des avis */}
-          <main className="reviews-main">
-            <div className="reviews-list-header">
+          <main className="rv-main">
+            <div className="rv-list-header">
               <h2>
                 {filteredReviews.length} avis {filterRating > 0 && `(${filterRating}+ étoiles)`}
               </h2>
             </div>
 
             {filteredReviews.length === 0 ? (
-              <div className="no-reviews">
-                <div className="no-reviews-icon">📝</div>
+              <div className="rv-empty">
+                <div className="rv-empty-icon">📝</div>
                 <h3>Aucun avis trouvé</h3>
                 <p>
                   {reviews.length === 0 
@@ -215,14 +215,14 @@ function Reviews() {
                 {reviews.length === 0 && (
                   <button 
                     onClick={() => setShowAddForm(true)} 
-                    className="btn btn-primary"
+                    className="rv-btn rv-btn-primary"
                   >
                     Laisser le premier avis
                   </button>
                 )}
               </div>
             ) : (
-              <div className="reviews-list">
+              <div className="rv-list">
                 {filteredReviews.map(review => (
                   <ReviewCard 
                     key={review.id} 

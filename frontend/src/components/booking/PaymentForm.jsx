@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import './PaymentForm.css';
 import stripeService from '../../services/stripeService';
+import bookingService from '../../services/bookingService';
 
-function PaymentForm({ amount, onSuccess }) {
+function PaymentForm({ amount, bookingId, onSuccess }) {
   const [cardNumber, setCardNumber] = useState('');
   const [cardName, setCardName] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
@@ -82,7 +83,7 @@ function PaymentForm({ amount, onSuccess }) {
     setErrors({});
 
     try {
-      // Créer un token de paiement
+      // 1. Créer un PaymentMethod (simulé pour l'instant)
       const paymentMethod = await stripeService.createPaymentMethod({
         cardNumber: cardNumber.replace(/\s/g, ''),
         cardName,
@@ -90,12 +91,24 @@ function PaymentForm({ amount, onSuccess }) {
         cvv
       });
 
-      // Confirmer le paiement
-      await stripeService.confirmPayment(paymentMethod.id, amount);
+      // 2. Créer le PaymentIntent avec le backend
+      const paymentResponse = await stripeService.createPaymentIntent(
+        bookingId,
+        amount,
+        'eur'
+      );
 
-      // Succès
-      onSuccess(paymentMethod);
+      // 3. Confirmer le paiement
+      await stripeService.confirmPayment(
+        bookingId,
+        paymentResponse.paymentIntentId
+      );
+
+      // 4. Succès !
+      onSuccess(paymentResponse);
+
     } catch (error) {
+      console.error('Erreur paiement:', error);
       setErrors({ submit: error.message || 'Erreur lors du paiement' });
     } finally {
       setIsProcessing(false);
@@ -106,7 +119,7 @@ function PaymentForm({ amount, onSuccess }) {
     <div className="payment-form-container">
       <div className="payment-amount-banner">
         <span className="amount-label">Montant à payer</span>
-        <span className="amount-value">{amount} DT</span>
+        <span className="amount-value">{amount} €</span>
       </div>
 
       <form onSubmit={handleSubmit} className="payment-form">
@@ -222,7 +235,7 @@ function PaymentForm({ amount, onSuccess }) {
           ) : (
             <>
               <span>🔐</span>
-              Payer {amount} DT
+              Payer {amount} €
             </>
           )}
         </button>

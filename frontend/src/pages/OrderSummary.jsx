@@ -1,79 +1,189 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './OrderSummary.css';
 import { Link, useNavigate } from 'react-router-dom';
+import cartService from '../services/cartService';
+import bookingService from '../services/bookingService';
+import stripeService from '../services/stripeService';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+
+const stripePromise = loadStripe('pk_test_51SyehhIp57yGvBCs1ryn1Z9unOJaGfhsPeybBdOsn594S9d240WwTDWpdtOqrglVbBnwenNeI9lXQ7lQ2GpBQWYp006kvB0Rt3');
+
+function PaymentFormStripe({ orderData, travelers, billingInfo, onSuccess }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      // 1. Créer une réservation (backend récupère le panier automatiquement)
+      console.log('🔵 Étape 1: Création de la réservation...');
+      const booking = await bookingService.createBooking();
+      console.log('✅ Réservation créée:', booking);
+
+      // 2. Créer Payment Intent avec le format attendu par votre backend
+      console.log('🔵 Étape 2: Création du PaymentIntent...');
+      const paymentResponse = await stripeService.createPaymentIntent({
+        amount: Math.round(orderData.total * 100), // En centimes
+        currency: 'eur',
+        bookingId: booking.id
+      });
+      console.log('✅ PaymentIntent créé:', paymentResponse);
+
+      // 3. Confirmer le paiement avec Stripe
+      console.log('🔵 Étape 3: Confirmation du paiement avec Stripe...');
+      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
+        paymentResponse.clientSecret,
+        {
+          payment_method: {
+            card: elements.getElement(CardElement),
+            billing_details: {
+              name: billingInfo.name,
+              address: {
+                line1: billingInfo.address,
+                city: billingInfo.city,
+                postal_code: billingInfo.zipCode,
+                country: billingInfo.country === 'Tunisie' ? 'TN' : 'FR'
+              }
+            }
+          }
+        }
+      );
+
+      if (stripeError) {
+        console.error('❌ Erreur Stripe:', stripeError);
+        throw new Error(stripeError.message);
+      }
+
+      console.log('✅ Paiement confirmé par Stripe:', paymentIntent);
+
+      // 4. Confirmer au backend que le paiement a réussi
+      console.log('🔵 Étape 4: Confirmation au backend...');
+      await stripeService.confirmPayment(booking.id, paymentIntent.id);
+      console.log('✅ Confirmation backend réussie');
+
+      // 5. Succès !
+      console.log('🎉 PAIEMENT RÉUSSI !');
+      onSuccess(booking);
+
+    } catch (error) {
+      console.error('💥 Erreur paiement:', error);
+      setError(error.message || 'Erreur lors du paiement');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="stripe-payment-form">
+      {error && (
+        <div className="alert alert-error">
+          <span className="alert-icon">⚠️</span>
+          {error}
+        </div>
+      )}
+
+      <div className="form-group">
+        <label>Informations de carte *</label>
+        <div className="card-element-wrapper">
+          <CardElement
+            options={{
+              style: {
+                base: {
+                  fontSize: '16px',
+                  color: '#424770',
+                  '::placeholder': {
+                    color: '#aab7c4',
+                  },
+                },
+                invalid: {
+                  color: '#9e2146',
+                },
+              },
+            }}
+          />
+        </div>
+        <p className="card-help-text">
+          💡 Carte de test : <strong>4242 4242 4242 4242</strong> | Expiration : n'importe quelle date future | CVC : 123
+        </p>
+      </div>
+
+      <button
+        type="submit"
+        className="btn-pay"
+        disabled={!stripe || isProcessing}
+      >
+        <span className="lock-icon">🔒</span>
+        {isProcessing ? 'Traitement en cours...' : `Payer ${orderData.total.toFixed(2)}€`}
+      </button>
+    </form>
+  );
+}
 
 function OrderSummary() {
   const navigate = useNavigate();
-  
-  const [step, setStep] = useState(1); // 1: Info voyageurs, 2: Paiement, 3: Confirmation
-
-  const [orderData] = useState({
-    items: [
-      {
-        id: 1,
-        type: 'flight',
-        title: 'Vol Paris - New York',
-        airline: 'Air France',
-        departure: '2025-02-15',
-        passengers: 2,
-        price: 900
-      },
-      {
-        id: 2,
-        type: 'hotel',
-        title: 'Hôtel Le Grand New York',
-        location: 'Manhattan, New York',
-        nights: 5,
-        price: 900
-      },
-      {
-        id: 3,
-        type: 'activity',
-        title: 'Visite Statue de la Liberté',
-        participants: 2,
-        price: 150
-      }
-    ],
-    subtotal: 1950,
-    discount: 195,
-    tax: 87.75,
-    total: 1842.75
-  });
+  const [step, setStep] = useState(1);
+  const [cart, setCart] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [travelers, setTravelers] = useState([
-    { firstName: '', lastName: '', dateOfBirth: '', passportNumber: '', email: '' },
     { firstName: '', lastName: '', dateOfBirth: '', passportNumber: '', email: '' }
   ]);
 
   const [billingInfo, setBillingInfo] = useState({
+    name: '',
     address: '',
     city: '',
     zipCode: '',
     country: 'Tunisie'
   });
 
-  const [paymentInfo, setPaymentInfo] = useState({
-    cardNumber: '',
-    cardName: '',
-    expiryDate: '',
-    cvv: ''
-  });
-
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [bookingReference] = useState('TH' + Date.now());
+  const [bookingData, setBookingData] = useState(null);
+
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  const fetchCart = async () => {
+    try {
+      setIsLoading(true);
+      const data = await cartService.getCart();
+      setCart(data);
+
+      // Ajuster le nombre de voyageurs selon le panier
+      const totalPassengers = data.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      setTravelers(Array(totalPassengers).fill().map(() => ({
+        firstName: '', lastName: '', dateOfBirth: '', passportNumber: '', email: ''
+      })));
+
+    } catch (error) {
+      console.error('Erreur chargement panier:', error);
+      alert('Erreur lors du chargement du panier');
+      navigate('/cart');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleTravelerChange = (index, field, value) => {
-    const updatedTravelers = [...travelers];
-    updatedTravelers[index][field] = value;
-    setTravelers(updatedTravelers);
+    const updated = [...travelers];
+    updated[index][field] = value;
+    setTravelers(updated);
   };
 
   const handleBillingChange = (field, value) => {
     setBillingInfo({ ...billingInfo, [field]: value });
-  };
-
-  const handlePaymentChange = (field, value) => {
-    setPaymentInfo({ ...paymentInfo, [field]: value });
   };
 
   const validateStep1 = () => {
@@ -82,12 +192,10 @@ function OrderSummary() {
 
   const validateStep2 = () => {
     return (
-      paymentInfo.cardNumber &&
-      paymentInfo.cardName &&
-      paymentInfo.expiryDate &&
-      paymentInfo.cvv &&
+      billingInfo.name &&
       billingInfo.address &&
       billingInfo.city &&
+      billingInfo.zipCode &&
       agreedToTerms
     );
   };
@@ -97,8 +205,7 @@ function OrderSummary() {
       setStep(2);
       window.scrollTo(0, 0);
     } else if (step === 2 && validateStep2()) {
-      setStep(3);
-      window.scrollTo(0, 0);
+      // Le paiement Stripe gérera la transition vers step 3
     } else {
       alert('Veuillez remplir tous les champs obligatoires');
     }
@@ -106,6 +213,12 @@ function OrderSummary() {
 
   const handlePreviousStep = () => {
     setStep(step - 1);
+    window.scrollTo(0, 0);
+  };
+
+  const handlePaymentSuccess = async (booking) => {
+    setBookingData(booking);
+    setStep(3);
     window.scrollTo(0, 0);
   };
 
@@ -117,6 +230,36 @@ function OrderSummary() {
       default: return '📦';
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="order-summary-page">
+        <div className="container">
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p>Chargement...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!cart || cart.items.length === 0) {
+    return (
+      <div className="order-summary-page">
+        <div className="container">
+          <div className="empty-state">
+            <h2>Votre panier est vide</h2>
+            <Link to="/cart" className="btn btn-primary">Retour au panier</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const subtotal = cart.totalPrice || 0;
+  const tax = subtotal * 0.05;
+  const total = subtotal + tax;
 
   return (
     <div className="order-summary-page">
@@ -142,7 +285,7 @@ function OrderSummary() {
         <div className="order-layout">
           {/* Main Content */}
           <div className="order-main">
-            {/* STEP 1: Informations voyageurs */}
+            {/* STEP 1 */}
             {step === 1 && (
               <div className="order-step">
                 <h2 className="step-title">
@@ -160,7 +303,6 @@ function OrderSummary() {
                           type="text"
                           value={traveler.firstName}
                           onChange={(e) => handleTravelerChange(index, 'firstName', e.target.value)}
-                          placeholder="Prénom"
                           required
                         />
                       </div>
@@ -170,7 +312,6 @@ function OrderSummary() {
                           type="text"
                           value={traveler.lastName}
                           onChange={(e) => handleTravelerChange(index, 'lastName', e.target.value)}
-                          placeholder="Nom"
                           required
                         />
                       </div>
@@ -183,12 +324,11 @@ function OrderSummary() {
                         />
                       </div>
                       <div className="form-group">
-                        <label>Numéro de passeport</label>
+                        <label>N° Passeport</label>
                         <input
                           type="text"
                           value={traveler.passportNumber}
                           onChange={(e) => handleTravelerChange(index, 'passportNumber', e.target.value)}
-                          placeholder="AB123456"
                         />
                       </div>
                       <div className="form-group full-width">
@@ -197,7 +337,6 @@ function OrderSummary() {
                           type="email"
                           value={traveler.email}
                           onChange={(e) => handleTravelerChange(index, 'email', e.target.value)}
-                          placeholder="email@example.com"
                           required
                         />
                       </div>
@@ -206,18 +345,15 @@ function OrderSummary() {
                 ))}
 
                 <div className="step-actions">
-                  <Link to="/cart" className="btn-back">
-                    ← Retour au panier
-                  </Link>
+                  <Link to="/cart" className="btn-back">← Retour au panier</Link>
                   <button className="btn-next" onClick={handleNextStep}>
-                    Continuer
-                    <span className="arrow">→</span>
+                    Continuer <span className="arrow">→</span>
                   </button>
                 </div>
               </div>
             )}
 
-            {/* STEP 2: Paiement */}
+            {/* STEP 2 */}
             {step === 2 && (
               <div className="order-step">
                 <h2 className="step-title">
@@ -225,17 +361,24 @@ function OrderSummary() {
                   Informations de paiement
                 </h2>
 
-                {/* Billing Address */}
                 <div className="billing-section">
                   <h3 className="section-subtitle">Adresse de facturation</h3>
                   <div className="form-grid">
+                    <div className="form-group full-width">
+                      <label>Nom complet *</label>
+                      <input
+                        type="text"
+                        value={billingInfo.name}
+                        onChange={(e) => handleBillingChange('name', e.target.value)}
+                        required
+                      />
+                    </div>
                     <div className="form-group full-width">
                       <label>Adresse *</label>
                       <input
                         type="text"
                         value={billingInfo.address}
                         onChange={(e) => handleBillingChange('address', e.target.value)}
-                        placeholder="123 Rue Example"
                         required
                       />
                     </div>
@@ -245,7 +388,6 @@ function OrderSummary() {
                         type="text"
                         value={billingInfo.city}
                         onChange={(e) => handleBillingChange('city', e.target.value)}
-                        placeholder="Tunis"
                         required
                       />
                     </div>
@@ -255,81 +397,24 @@ function OrderSummary() {
                         type="text"
                         value={billingInfo.zipCode}
                         onChange={(e) => handleBillingChange('zipCode', e.target.value)}
-                        placeholder="1000"
                         required
                       />
-                    </div>
-                    <div className="form-group full-width">
-                      <label>Pays *</label>
-                      <select
-                        value={billingInfo.country}
-                        onChange={(e) => handleBillingChange('country', e.target.value)}
-                      >
-                        <option value="Tunisie">Tunisie</option>
-                        <option value="France">France</option>
-                        <option value="Maroc">Maroc</option>
-                        <option value="Algérie">Algérie</option>
-                      </select>
                     </div>
                   </div>
                 </div>
 
-                {/* Payment Method */}
                 <div className="payment-section">
-                  <h3 className="section-subtitle">Informations de carte</h3>
-                  <div className="payment-cards">
-                    <span className="card-icon">💳 Visa</span>
-                    <span className="card-icon">💳 Mastercard</span>
-                    <span className="card-icon">💳 Amex</span>
-                  </div>
-                  <div className="form-grid">
-                    <div className="form-group full-width">
-                      <label>Numéro de carte *</label>
-                      <input
-                        type="text"
-                        value={paymentInfo.cardNumber}
-                        onChange={(e) => handlePaymentChange('cardNumber', e.target.value)}
-                        placeholder="1234 5678 9012 3456"
-                        maxLength="19"
-                        required
-                      />
-                    </div>
-                    <div className="form-group full-width">
-                      <label>Nom sur la carte *</label>
-                      <input
-                        type="text"
-                        value={paymentInfo.cardName}
-                        onChange={(e) => handlePaymentChange('cardName', e.target.value)}
-                        placeholder="SYRINE TRABELSI"
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Date d'expiration *</label>
-                      <input
-                        type="text"
-                        value={paymentInfo.expiryDate}
-                        onChange={(e) => handlePaymentChange('expiryDate', e.target.value)}
-                        placeholder="MM/YY"
-                        maxLength="5"
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>CVV *</label>
-                      <input
-                        type="text"
-                        value={paymentInfo.cvv}
-                        onChange={(e) => handlePaymentChange('cvv', e.target.value)}
-                        placeholder="123"
-                        maxLength="3"
-                        required
-                      />
-                    </div>
-                  </div>
+                  <h3 className="section-subtitle">Paiement sécurisé par Stripe</h3>
+                  <Elements stripe={stripePromise}>
+                    <PaymentFormStripe
+                      orderData={{ total }}
+                      travelers={travelers}
+                      billingInfo={billingInfo}
+                      onSuccess={handlePaymentSuccess}
+                    />
+                  </Elements>
                 </div>
 
-                {/* Terms and Conditions */}
                 <div className="terms-section">
                   <label className="checkbox-label-large">
                     <input
@@ -338,116 +423,55 @@ function OrderSummary() {
                       onChange={(e) => setAgreedToTerms(e.target.checked)}
                     />
                     <span>
-                      J'accepte les{' '}
-                      <Link to="/terms" target="_blank">conditions générales</Link>
-                      {' '}et la{' '}
-                      <Link to="/privacy" target="_blank">politique de confidentialité</Link>
+                      J'accepte les <Link to="/terms" target="_blank">conditions générales</Link>
                     </span>
                   </label>
                 </div>
 
                 <div className="step-actions">
-                  <button className="btn-back" onClick={handlePreviousStep}>
-                    ← Retour
-                  </button>
-                  <button className="btn-pay" onClick={handleNextStep}>
-                    <span className="lock-icon">🔒</span>
-                    Payer {orderData.total.toFixed(2)}€
-                  </button>
+                  <button className="btn-back" onClick={handlePreviousStep}>← Retour</button>
                 </div>
               </div>
             )}
 
-            {/* STEP 3: Confirmation */}
-            {step === 3 && (
+            {/* STEP 3 */}
+            {step === 3 && bookingData && (
               <div className="order-step confirmation-step">
                 <div className="confirmation-icon">✅</div>
                 <h2 className="confirmation-title">Réservation confirmée !</h2>
                 <p className="confirmation-text">
-                  Merci pour votre réservation. Un email de confirmation a été envoyé à votre adresse.
+                  Merci pour votre réservation. Un email de confirmation a été envoyé.
                 </p>
 
                 <div className="booking-ref-card">
-                  <h3>Référence de réservation</h3>
-                  <div className="booking-ref-number">{bookingReference}</div>
-                  <p className="booking-ref-info">
-                    Conservez cette référence pour suivre votre réservation
-                  </p>
-                </div>
-
-                <div className="confirmation-details">
-                  <h3 className="details-title">Détails de votre réservation</h3>
-                  <div className="confirmation-items">
-                    {orderData.items.map(item => (
-                      <div key={item.id} className="confirmation-item">
-                        <span className="item-icon">{getItemIcon(item.type)}</span>
-                        <span className="item-name">{item.title}</span>
-                        <span className="item-price">{item.price}€</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="confirmation-total">
-                    <span>Total payé</span>
-                    <span className="total-amount">{orderData.total.toFixed(2)}€</span>
-                  </div>
+                  <h3>Référence</h3>
+                  <div className="booking-ref-number">{bookingData.bookingReference || bookingData.id}</div>
                 </div>
 
                 <div className="confirmation-actions">
-                  <button className="btn-download">
-                    <span className="download-icon">📥</span>
-                    Télécharger la confirmation
-                  </button>
-                  <Link to="/booking-history" className="btn-view-bookings">
+                  <Link to="/booking-history" className="btn btn-primary">
                     Voir mes réservations
                   </Link>
-                  <Link to="/" className="btn-home">
+                  <Link to="/" className="btn btn-secondary">
                     Retour à l'accueil
                   </Link>
-                </div>
-
-                <div className="next-steps">
-                  <h3 className="next-steps-title">Prochaines étapes</h3>
-                  <div className="next-steps-list">
-                    <div className="next-step-item">
-                      <span className="step-icon">📧</span>
-                      <div className="step-content">
-                        <h4>Vérifiez vos emails</h4>
-                        <p>Vous recevrez tous les détails par email</p>
-                      </div>
-                    </div>
-                    <div className="next-step-item">
-                      <span className="step-icon">📱</span>
-                      <div className="step-content">
-                        <h4>Téléchargez vos billets</h4>
-                        <p>Disponibles dans "Mes réservations"</p>
-                      </div>
-                    </div>
-                    <div className="next-step-item">
-                      <span className="step-icon">✈️</span>
-                      <div className="step-content">
-                        <h4>Préparez votre voyage</h4>
-                        <p>Vérifiez vos documents de voyage</p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Order Sidebar */}
+          {/* Sidebar */}
           <div className="order-sidebar">
             <div className="order-summary-card">
               <h3 className="summary-card-title">Récapitulatif</h3>
 
               <div className="summary-items">
-                {orderData.items.map(item => (
-                  <div key={item.id} className="summary-item">
+                {cart.items.map((item, index) => (
+                  <div key={index} className="summary-item">
                     <span className="item-icon">{getItemIcon(item.type)}</span>
                     <div className="item-info">
-                      <div className="item-name">{item.title}</div>
-                      <div className="item-price">{item.price}€</div>
+                      <div className="item-name">{item.type} - {item.itemId}</div>
+                      <div className="item-price">{item.price} {cart.currency}</div>
                     </div>
                   </div>
                 ))}
@@ -456,30 +480,15 @@ function OrderSummary() {
               <div className="summary-breakdown">
                 <div className="breakdown-row">
                   <span>Sous-total</span>
-                  <span>{orderData.subtotal.toFixed(2)}€</span>
-                </div>
-                <div className="breakdown-row discount">
-                  <span>Réduction</span>
-                  <span>-{orderData.discount.toFixed(2)}€</span>
+                  <span>{subtotal.toFixed(2)} {cart.currency}</span>
                 </div>
                 <div className="breakdown-row">
-                  <span>Taxes</span>
-                  <span>{orderData.tax.toFixed(2)}€</span>
+                  <span>Taxes (5%)</span>
+                  <span>{tax.toFixed(2)} {cart.currency}</span>
                 </div>
                 <div className="breakdown-row total">
                   <span>Total</span>
-                  <span>{orderData.total.toFixed(2)}€</span>
-                </div>
-              </div>
-
-              <div className="security-badges">
-                <div className="security-badge">
-                  <span className="badge-icon">🔒</span>
-                  <span>Paiement sécurisé SSL</span>
-                </div>
-                <div className="security-badge">
-                  <span className="badge-icon">✓</span>
-                  <span>Garantie meilleur prix</span>
+                  <span>{total.toFixed(2)} {cart.currency}</span>
                 </div>
               </div>
             </div>

@@ -36,8 +36,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Endpoints publics - TRÈS IMPORTANT
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()  // ✅ MODIFIÉ : Autorise tous les endpoints /auth/*
                         .requestMatchers("/api/search/**").permitAll()
+                        .requestMatchers("/api/home/**").permitAll()
                         .requestMatchers("/api/currency/**").permitAll()
 
                         // Swagger

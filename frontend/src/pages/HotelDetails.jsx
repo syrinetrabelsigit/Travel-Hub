@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './HotelDetails.css';
 import searchService from '../services/searchService';
+import cartService from '../services/cartService';
+import authService from '../services/authService';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
 function HotelDetails() {
@@ -27,6 +29,15 @@ function HotelDetails() {
   };
 
   const handleBooking = () => {
+    // Vérifier si l'utilisateur est connecté
+    if (!authService.isAuthenticated()) {
+      // Sauvegarder l'URL actuelle pour rediriger après connexion
+      localStorage.setItem('redirectAfterLogin', `/booking/hotels/${id}`);
+      navigate('/login');
+      return;
+    }
+    
+    // Si connecté, procéder à la réservation
     navigate(`/booking/hotels/${id}`);
   };
 

@@ -94,6 +94,7 @@ public class HotelService {
         hotel.put("amenities", Arrays.asList(amenities.split(", ")));
         hotel.put("reviews", (int)(Math.random() * 1000 + 500));
         hotel.put("availability", "Disponible");
+        hotel.put("imageUrl", getHotelImage(name));
         return hotel;
     }
 
@@ -107,4 +108,19 @@ public class HotelService {
         hotel.put("currency", "EUR");
         return hotel;
     }
+
+    private String getHotelImage(String hotelName) {
+        Map<String, String> images = new HashMap<>();
+
+        images.put("Hôtel Le Bristol Paris", "https://images.unsplash.com/photo-1566073771259-6a8506099945");
+        images.put("Pullman Paris Tour Eiffel", "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa");
+        images.put("Ibis Budget Paris La Villette", "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267");
+        images.put("Novotel Paris Les Halles", "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b");
+        images.put("Hôtel Lutetia", "https://images.unsplash.com/photo-1590490360182-c33d57733427");
+
+        // image par défaut si non trouvée
+        return images.getOrDefault(hotelName,
+                "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa");
+    }
+
 }

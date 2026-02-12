@@ -254,3 +254,49 @@
     grid-template-columns: 1fr;
   }
 }
+/* Stripe Card Element Wrapper */
+.card-element-wrapper {
+  padding: 12px;
+  border: 2px solid #E5E7EB;
+  border-radius: var(--border-radius);
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.card-element-wrapper:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+.card-help-text {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--neutral-color);
+  line-height: 1.5;
+}
+
+.stripe-badge {
+  padding: 0.5rem 1rem;
+  background: #635BFF;
+  color: white;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  display: inline-block;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

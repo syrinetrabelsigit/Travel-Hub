@@ -74,37 +74,41 @@ function AdminBookings() {
     );
   }
 
-  return (
+   return (
     <div className="admin-bookings">
-      <div className="admin-container">
+      <div className="ab-container">
         {/* Header */}
-        <div className="page-header">
-          <div>
-            <Link to="/admin" className="back-link">← Retour au Dashboard</Link>
-            <h1 className="page-title">Gestion des Réservations</h1>
-            <p className="page-subtitle">{bookings.length} réservations au total</p>
+          <div className="ab-page-header">
+            <div className="ab-header-content">
+              <Link to="/admin" className="ab-back-link">← Retour au Dashboard</Link>
+              <h1 className="ab-page-title">Gestion des Réservations</h1>
+              <p className="ab-page-subtitle">{bookings.length} réservations au total</p>
+            </div>
+            <div className="ab-header-stats">
+              <span>{bookings.length}</span>
+              <label>Réservations</label>
+            </div>
           </div>
-        </div>
 
         {/* Filters */}
-        <div className="filters-bar">
-          <div className="search-box">
-            <span className="search-icon">🔍</span>
+        <div className="ab-filters-bar">
+          <div className="ab-search-box">
+            <span className="ab-search-icon">🔍</span>
             <input
               type="text"
               placeholder="Rechercher par ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
+              className="ab-search-input"
             />
           </div>
 
-          <div className="filter-group">
+          <div className="ab-filter-group">
             <label>Statut:</label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="filter-select"
+              className="ab-filter-select"
             >
               <option value="ALL">Tous</option>
               <option value="PENDING">En attente</option>
@@ -113,26 +117,30 @@ function AdminBookings() {
               <option value="COMPLETED">Terminé</option>
             </select>
           </div>
+          
+          <div className="ab-filter-stats">
+            Résultats: <span>{filteredBookings.length}</span>
+          </div>
         </div>
 
         {/* Bookings List */}
-        <div className="bookings-grid">
+        <div className="ab-bookings-grid">
           {filteredBookings.length === 0 ? (
-            <div className="no-results">
+            <div className="ab-no-results">
               <p>Aucune réservation trouvée</p>
             </div>
           ) : (
             filteredBookings.map(booking => (
-              <div key={booking.id} className="booking-card">
-                <div className="booking-header">
+              <div key={booking.id} className={`ab-booking-card ${booking.status?.toLowerCase()}`}>
+                <div className="ab-booking-header">
                   <div>
-                    <h3 className="booking-title">{booking.type || 'Vol'}</h3>
-                    <p className="booking-id">ID: {booking.id}</p>
+                    <h3 className="ab-booking-title">{booking.type || 'Vol'}</h3>
+                    <p className="ab-booking-id">ID: {booking.id}</p>
                   </div>
                   <select
                     value={booking.status}
                     onChange={(e) => handleStatusChange(booking.id, e.target.value)}
-                    className={`status-badge ${booking.status?.toLowerCase()}`}
+                    className={`ab-status-badge ${booking.status?.toLowerCase()}`}
                   >
                     <option value="PENDING">En attente</option>
                     <option value="CONFIRMED">Confirmé</option>
@@ -141,13 +149,13 @@ function AdminBookings() {
                   </select>
                 </div>
 
-                <div className="booking-details">
-                  <div className="detail-item">
-                    <span className="detail-icon">👤</span>
+                <div className="ab-booking-details">
+                  <div className="ab-detail-item">
+                    <span className="ab-detail-icon">👤</span>
                     <span>User ID: {booking.userId}</span>
                   </div>
-                  <div className="detail-item">
-                    <span className="detail-icon">📅</span>
+                  <div className="ab-detail-item">
+                    <span className="ab-detail-icon">📅</span>
                     <span>
                       {booking.createdAt 
                         ? new Date(booking.createdAt).toLocaleDateString('fr-FR')
@@ -155,27 +163,27 @@ function AdminBookings() {
                       }
                     </span>
                   </div>
-                  <div className="detail-item">
-                    <span className="detail-icon">💰</span>
+                  <div className="ab-detail-item">
+                    <span className="ab-detail-icon">💰</span>
                     <span>{booking.totalPrice?.toFixed(2) || '0.00'} DT</span>
                   </div>
                 </div>
 
                 {booking.items && booking.items.length > 0 && (
-                  <div className="booking-items">
+                  <div className="ab-booking-items">
                     <h4>Articles:</h4>
                     {booking.items.map((item, index) => (
-                      <div key={index} className="item-chip">
+                      <div key={index} className="ab-item-chip">
                         {item.type}: {item.name}
                       </div>
                     ))}
                   </div>
                 )}
 
-                <div className="booking-actions">
+                <div className="ab-booking-actions">
                   <button
                     onClick={() => handleDeleteBooking(booking.id)}
-                    className="btn-delete"
+                    className="ab-btn-delete"
                   >
                     🗑️ Supprimer
                   </button>

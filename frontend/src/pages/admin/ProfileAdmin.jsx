@@ -167,8 +167,8 @@ function ProfileAdmin() {
     return (
       <div className="profile-admin-page">
         <div className="container">
-          <div className="loading-spinner">
-            <div className="spinner"></div>
+          <div className="pap-loading-spinner">
+            <div className="pap-spinner"></div>
             <p>Chargement du profil admin...</p>
           </div>
         </div>
@@ -242,11 +242,11 @@ function ProfileAdmin() {
         </div>
         {/* Navigation */}
         <div className="profile-nav">
-          <a href="/admin/profile" className="profile-nav-link active">
+          <a href="/profileAdmin" className="profile-nav-link active">
             <span className="nav-icon">👤</span>
             Mon profil
           </a>
-          <a href="/admin/dashboard" className="profile-nav-link">
+          <a href="/admin" className="profile-nav-link">
             <span className="nav-icon">📊</span>
             Tableau de bord
           </a>

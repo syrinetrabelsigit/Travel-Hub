@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './SearchResults.css';
 import ResultCard from '../components/search/ResultCard';
 import FilterPanel from '../components/search/FilterPanel';
 
 function SearchResults() {
   const location = useLocation();
-  const [searchParams] = useSearchParams();
-  const [results, setResults] = useState([]);
+  const navigate = useNavigate();
+  
+  // Récupérer les résultats passés par Search.jsx
+  const [results, setResults] = useState(location.state?.results || []);
+  const [searchParams, setSearchParams] = useState(location.state?.searchParams || {});
   const [filteredResults, setFilteredResults] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [sortBy, setSortBy] = useState('recommended');
   const [filters, setFilters] = useState({
     priceMin: 0,
@@ -20,82 +23,99 @@ function SearchResults() {
     amenities: []
   });
 
+  // Déterminer le type de recherche depuis l'URL
   const searchType = location.pathname.split('/')[2]; // flights, hotels, ou activities
 
+  // Rediriger si aucun résultat n'est disponible
   useEffect(() => {
-    fetchResults();
-  }, [searchParams]);
+    if (!location.state || !location.state.results) {
+      console.warn('⚠️ Aucun résultat disponible, redirection vers /search');
+      navigate('/search');
+    }
+  }, [location.state, navigate]);
 
+  // Appliquer les filtres et le tri dès que les résultats changent
   useEffect(() => {
     applyFiltersAndSort();
   }, [results, filters, sortBy]);
 
-  const fetchResults = async () => {
-    setIsLoading(true);
-    try {
-      const query = Object.fromEntries(searchParams);
-      const response = await fetch(
-        `http://localhost:8080/api/search/${searchType}?${new URLSearchParams(query)}`
-      );
-      
-      if (!response.ok) {
-        throw new Error('Erreur lors de la recherche');
-      }
-
-      const data = await response.json();
-      setResults(data.results || []);
-    } catch (error) {
-      console.error('Erreur:', error);
-      setResults([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const applyFiltersAndSort = () => {
+    if (!results || results.length === 0) {
+      setFilteredResults([]);
+      return;
+    }
+
     let filtered = [...results];
 
     // Application des filtres
     filtered = filtered.filter(item => {
-      if (item.price < filters.priceMin || item.price > filters.priceMax) return false;
-      if (item.rating < filters.rating) return false;
+      // Filtre par prix
+      const itemPrice = item.price || item.pricePerNight || 0;
+      if (itemPrice < filters.priceMin || itemPrice > filters.priceMax) return false;
+      
+      // Filtre par note
+      const itemRating = item.rating || 0;
+      if (itemRating < filters.rating) return false;
+      
+      // Filtre par escales (vols uniquement)
       if (filters.stops !== 'all' && searchType === 'flights') {
         if (filters.stops === 'direct' && item.stops > 0) return false;
         if (filters.stops === '1stop' && item.stops !== 1) return false;
       }
+      
       return true;
     });
 
     // Application du tri
     switch (sortBy) {
       case 'price_asc':
-        filtered.sort((a, b) => a.price - b.price);
+        filtered.sort((a, b) => {
+          const priceA = a.price || a.pricePerNight || 0;
+          const priceB = b.price || b.pricePerNight || 0;
+          return priceA - priceB;
+        });
         break;
       case 'price_desc':
-        filtered.sort((a, b) => b.price - a.price);
+        filtered.sort((a, b) => {
+          const priceA = a.price || a.pricePerNight || 0;
+          const priceB = b.price || b.pricePerNight || 0;
+          return priceB - priceA;
+        });
         break;
       case 'rating':
-        filtered.sort((a, b) => b.rating - a.rating);
+        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
         break;
       case 'duration':
         if (searchType === 'flights') {
-          filtered.sort((a, b) => a.duration - b.duration);
+          filtered.sort((a, b) => (a.duration || 0) - (b.duration || 0));
         }
         break;
       default:
-        // recommended - ordre par défaut de l'API
+        // recommended - ordre par défaut
         break;
     }
 
+    console.log('📊 Résultats filtrés:', filtered.length, 'sur', results.length);
     setFilteredResults(filtered);
   };
 
   const handleFilterChange = (newFilters) => {
+    console.log('🔧 Nouveaux filtres:', newFilters);
     setFilters(prev => ({ ...prev, ...newFilters }));
   };
 
   const handleSortChange = (e) => {
+    console.log('🔀 Nouveau tri:', e.target.value);
     setSortBy(e.target.value);
+  };
+
+  const getSearchTypeLabel = () => {
+    switch(searchType) {
+      case 'flights': return 'vols';
+      case 'hotels': return 'hôtels';
+      case 'activities': return 'activités';
+      default: return 'résultats';
+    }
   };
 
   if (isLoading) {
@@ -114,9 +134,41 @@ function SearchResults() {
   return (
     <div className="search-results-page">
       <div className="container">
+        {/* Paramètres de recherche */}
+        <div className="search-summary">
+          <button onClick={() => navigate('/search')} className="btn-back">
+            ← Modifier la recherche
+          </button>
+          <div className="search-info">
+            {searchType === 'hotels' && (
+              <p>
+                📍 {searchParams.destination} • 
+                📅 {searchParams.checkIn ? new Date(searchParams.checkIn).toLocaleDateString('fr-FR') : ''} - 
+                {searchParams.checkOut ? new Date(searchParams.checkOut).toLocaleDateString('fr-FR') : ''} • 
+                👥 {searchParams.guests} voyageur{searchParams.guests > 1 ? 's' : ''} • 
+                🛏️ {searchParams.rooms} chambre{searchParams.rooms > 1 ? 's' : ''}
+              </p>
+            )}
+            {searchType === 'flights' && (
+              <p>
+                ✈️ {searchParams.from} → {searchParams.to} • 
+                📅 {searchParams.departDate ? new Date(searchParams.departDate).toLocaleDateString('fr-FR') : ''} • 
+                👥 {searchParams.passengers} passager{searchParams.passengers > 1 ? 's' : ''}
+              </p>
+            )}
+            {searchType === 'activities' && (
+              <p>
+                🎯 {searchParams.destination} • 
+                📅 {searchParams.date ? new Date(searchParams.date).toLocaleDateString('fr-FR') : ''} • 
+                👥 {searchParams.participants} participant{searchParams.participants > 1 ? 's' : ''}
+              </p>
+            )}
+          </div>
+        </div>
+
         <div className="results-header">
           <h1 className="results-title">
-            {filteredResults.length} résultat{filteredResults.length > 1 ? 's' : ''} trouvé{filteredResults.length > 1 ? 's' : ''}
+            {filteredResults.length} {getSearchTypeLabel()} trouvé{filteredResults.length > 1 ? 's' : ''}
           </h1>
           
           <div className="results-controls">
@@ -154,7 +206,14 @@ function SearchResults() {
               <div className="no-results">
                 <div className="no-results-icon">🔍</div>
                 <h2>Aucun résultat trouvé</h2>
-                <p>Essayez d'ajuster vos filtres ou vos critères de recherche</p>
+                <p>
+                  {results.length === 0 
+                    ? 'La recherche n\'a retourné aucun résultat. Essayez d\'autres critères.'
+                    : 'Aucun résultat ne correspond à vos filtres. Essayez d\'ajuster les filtres.'}
+                </p>
+                <button onClick={() => navigate('/search')} className="btn btn-primary">
+                  Nouvelle recherche
+                </button>
               </div>
             ) : (
               <div className="results-grid">

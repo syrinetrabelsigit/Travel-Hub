@@ -1,77 +1,62 @@
-import { apiService } from './api';
-import config from '../config/config';
+import apiService from './apiService';
 
 const cartService = {
-  // Récupérer le panier
-  getCart: async () => {
+  // Obtenir le panier
+  async getCart() {
     try {
-      const response = await apiService.get(config.API_ENDPOINTS.CART.GET);
-      return response.data;
+      const response = await apiService.get('/cart');
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur getCart:', error);
+      return {
+        items: [],
+        totalPrice: 0,
+        currency: 'EUR'
+      };
     }
   },
 
   // Ajouter un article au panier
-  addItem: async (item) => {
+  async addItem(item) {
     try {
-      const response = await apiService.post(
-        config.API_ENDPOINTS.CART.ADD_ITEM,
-        item
-      );
-      return response.data;
+      const response = await apiService.post('/cart/items', item);
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur addItem:', error);
+      throw error;
     }
   },
 
-  // Mettre à jour un article du panier
-  updateItem: async (itemId, updateData) => {
+  // Mettre à jour un article (par index)
+  async updateItem(index, item) {
     try {
-      const response = await apiService.put(
-        config.API_ENDPOINTS.CART.UPDATE_ITEM,
-        updateData,
-        { id: itemId }
-      );
-      return response.data;
+      const response = await apiService.put(`/cart/items/${index}`, item);
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur updateItem:', error);
+      throw error;
     }
   },
 
-  // Supprimer un article du panier
-  removeItem: async (itemId) => {
+  // Supprimer un article (par index)
+  async removeItem(index) {
     try {
-      const response = await apiService.delete(
-        config.API_ENDPOINTS.CART.REMOVE_ITEM,
-        { id: itemId }
-      );
-      return response.data;
+      const response = await apiService.delete(`/cart/items/${index}`);
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur removeItem:', error);
+      throw error;
     }
   },
 
   // Vider le panier
-  clearCart: async () => {
+  async clearCart() {
     try {
-      const response = await apiService.delete(config.API_ENDPOINTS.CART.CLEAR);
-      return response.data;
+      const response = await apiService.delete('/cart');
+      return response;
     } catch (error) {
-      throw error.response?.data || error;
-    }
-  },
-
-  // Appliquer un code promo
-  applyPromoCode: async (promoCode) => {
-    try {
-      const response = await apiService.post(
-        config.API_ENDPOINTS.CART.APPLY_PROMO,
-        { code: promoCode }
-      );
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error;
+      console.error('Erreur clearCart:', error);
+      throw error;
     }
   }
 };

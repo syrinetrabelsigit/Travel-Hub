@@ -28,10 +28,6 @@ public class StripeService {
         Stripe.apiKey = stripeApiKey;
 
         try {
-            // Récupérer la réservation
-            Booking booking = bookingRepository.findById(bookingId)
-                    .orElseThrow(() -> new RuntimeException("Réservation non trouvée"));
-
             // Convertir le montant en centimes (Stripe utilise les centimes)
             long amountInCents = (long) (amount * 100);
 
@@ -44,11 +40,20 @@ public class StripeService {
 
             PaymentIntent paymentIntent = PaymentIntent.create(params);
 
-            // Mettre à jour la réservation
-            booking.setStripePaymentId(paymentIntent.getId());
-            booking.setPaymentStatus("pending");
-            booking.setUpdatedAt(LocalDateTime.now());
-            bookingRepository.save(booking);
+            // ✅ Si bookingId existe et n'est pas "temp", mettre à jour la réservation
+            if (bookingId != null && !bookingId.equals("temp")) {
+                try {
+                    Booking booking = bookingRepository.findById(bookingId).orElse(null);
+                    if (booking != null) {
+                        booking.setStripePaymentId(paymentIntent.getId());
+                        booking.setPaymentStatus("pending");
+                        booking.setUpdatedAt(LocalDateTime.now());
+                        bookingRepository.save(booking);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Booking non trouvé (normal si créé après paiement): " + e.getMessage());
+                }
+            }
 
             // Retourner les informations
             Map<String, Object> response = new HashMap<>();
@@ -80,6 +85,7 @@ public class StripeService {
                 booking.setPaymentStatus("paid");
                 booking.setStatus("confirmed");
                 booking.setConfirmedAt(LocalDateTime.now());
+                booking.setStripePaymentId(paymentIntentId); // ✅ Ajouter le payment ID
             } else if ("requires_action".equals(paymentIntent.getStatus())) {
                 booking.setPaymentStatus("pending");
             } else {
@@ -103,7 +109,7 @@ public class StripeService {
 
     public void handleWebhook(String payload, String sigHeader) {
         // TODO: Implémenter la vérification de signature et le traitement des webhooks
-        // Pour l'instant, on laisse vide (optionnel pour la démo)
+        System.out.println("Webhook reçu: " + payload);
     }
 
     public Map<String, Object> refundPayment(String bookingId) {

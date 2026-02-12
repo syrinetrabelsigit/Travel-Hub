@@ -25,9 +25,13 @@ function BookingConfirmation() {
     }
   };
 
-  const handleDownloadPDF = () => {
-    // Logique pour télécharger le PDF de confirmation
-    alert('Téléchargement du PDF en cours...');
+  const handleDownloadPDF = async () => {
+    try {
+      await bookingService.downloadInvoice(id);
+    } catch (error) {
+      console.error('Erreur téléchargement PDF:', error);
+      alert('Erreur lors du téléchargement de la facture');
+    }
   };
 
   const handlePrint = () => {

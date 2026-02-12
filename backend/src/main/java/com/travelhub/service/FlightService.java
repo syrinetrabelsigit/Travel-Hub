@@ -47,8 +47,18 @@ public class FlightService {
         flight1.put("cabinClass", request.getCabinClass());
         flight1.put("stops", 0);
         flights.add(flight1);
+        flight1.put("airlineLogo", getAirlineLogo("Air France"));
+
 
         return flights;
+    }
+
+    private String getAirlineLogo(String airline) {
+        return switch (airline) {
+            case "Air France" -> "https://logo.clearbit.com/airfrance.com";
+            case "Tunisair" -> "https://logo.clearbit.com/tunisair.com";
+            default -> "https://via.placeholder.com/50";
+        };
     }
 
     public Map<String, Object> getFlightById(String id) {

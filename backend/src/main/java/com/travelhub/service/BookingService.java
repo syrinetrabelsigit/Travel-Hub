@@ -26,11 +26,17 @@ public class BookingService {
     @Autowired
     private EmailService emailService;
 
+    /**
+     * Récupérer toutes les réservations de l'utilisateur connecté
+     */
     public List<Booking> getUserBookings() {
         User currentUser = userService.getCurrentUser();
         return bookingRepository.findByUserId(currentUser.getId());
     }
 
+    /**
+     * Récupérer une réservation par ID
+     */
     public Booking getBookingById(String id) {
         User currentUser = userService.getCurrentUser();
 
@@ -45,9 +51,12 @@ public class BookingService {
         return booking;
     }
 
+    /**
+     * Créer une réservation depuis le panier
+     */
     public Booking createBooking() {
         User currentUser = userService.getCurrentUser();
-        Cart cart = cartService.getCart();
+        Cart cart = cartService.getCart(); // ✅ SANS TOKEN
 
         if (cart.getItems().isEmpty()) {
             throw new RuntimeException("Le panier est vide");
@@ -74,24 +83,27 @@ public class BookingService {
 
         try {
             emailService.sendBookingConfirmation(savedBooking, currentUser.getEmail());
-            System.out.println("Email envoyé avec succès !");
+            System.out.println("✅ Email envoyé avec succès !");
         } catch (Exception e) {
-            System.err.println("Erreur envoi email: " + e.getMessage());
+            System.err.println("❌ Erreur envoi email: " + e.getMessage());
             e.printStackTrace();
         }
 
         System.out.println("=== FIN ENVOI EMAIL ===");
 
         // Vider le panier
-        cartService.clearCart();
+        cartService.clearCart(); // ✅ SANS TOKEN
 
         return savedBooking;
     }
 
+    /**
+     * Annuler une réservation
+     */
     public Booking cancelBooking(String id) {
         Booking booking = getBookingById(id);
 
-        if (!"pending".equals(booking.getStatus())) {
+        if (!"pending".equals(booking.getStatus()) && !"confirmed".equals(booking.getStatus())) {
             throw new RuntimeException("Impossible d'annuler cette réservation");
         }
 
@@ -102,12 +114,28 @@ public class BookingService {
 
         // Envoyer email d'annulation
         try {
-            User user = userService.getUserById(booking.getUserId());
+            User user = userService.getCurrentUser();
             emailService.sendBookingCancellation(cancelledBooking, user.getEmail());
+            System.out.println("✅ Email d'annulation envoyé");
         } catch (Exception e) {
-            System.err.println("Erreur envoi email annulation: " + e.getMessage());
+            System.err.println("❌ Erreur envoi email annulation: " + e.getMessage());
         }
 
         return cancelledBooking;
+    }
+
+    /**
+     * Confirmer une réservation après paiement
+     */
+    public Booking confirmBooking(String id, String stripePaymentId) {
+        Booking booking = getBookingById(id);
+
+        booking.setStatus("confirmed");
+        booking.setPaymentStatus("paid");
+        booking.setStripePaymentId(stripePaymentId);
+        booking.setConfirmedAt(LocalDateTime.now());
+        booking.setUpdatedAt(LocalDateTime.now());
+
+        return bookingRepository.save(booking);
     }
 }

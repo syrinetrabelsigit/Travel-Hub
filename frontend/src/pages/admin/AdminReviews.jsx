@@ -87,24 +87,28 @@ function AdminReviews() {
 
   return (
     <div className="admin-reviews">
-      <div className="admin-container">
+      <div className="ar-container">
         {/* Header */}
-        <div className="page-header">
-          <div>
-            <Link to="/admin" className="back-link">← Retour au Dashboard</Link>
-            <h1 className="page-title">Modération des Avis</h1>
-            <p className="page-subtitle">{reviews.length} avis au total</p>
+        <div className="ar-page-header">
+          <div className="ar-header-content">
+            <Link to="/admin" className="ar-back-link">← Retour au Dashboard</Link>
+            <h1 className="ar-page-title">Modération des Avis</h1>
+            <p className="ar-page-subtitle">{reviews.length} avis au total</p>
+          </div>
+          <div className="ar-header-stats">
+            <span>{reviews.length}</span>
+            <label>Avis</label>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="filters-bar">
-          <div className="filter-group">
+        <div className="ar-filters-bar">
+          <div className="ar-filter-group">
             <label>Statut:</label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="filter-select"
+              className="ar-filter-select"
             >
               <option value="ALL">Tous</option>
               <option value="PENDING">En attente</option>
@@ -115,42 +119,42 @@ function AdminReviews() {
         </div>
 
         {/* Reviews List */}
-        <div className="reviews-list">
+        <div className="ar-reviews-list">
           {filteredReviews.length === 0 ? (
-            <div className="no-results">
+            <div className="ar-no-results">
               <p>Aucun avis trouvé</p>
             </div>
           ) : (
             filteredReviews.map(review => (
-              <div key={review.id} className={`review-card ${review.status?.toLowerCase()}`}>
-                <div className="review-header">
-                  <div className="reviewer-info">
-                    <div className="reviewer-avatar">
+              <div key={review.id} className={`ar-review-card ${review.status?.toLowerCase()}`}>
+                <div className="ar-review-header">
+                  <div className="ar-reviewer-info">
+                    <div className="ar-reviewer-avatar">
                       {review.userName?.[0] || '?'}
                     </div>
                     <div>
-                      <h3 className="reviewer-name">{review.userName || 'Utilisateur'}</h3>
-                      <div className="review-rating">
+                      <h3 className="ar-reviewer-name">{review.userName || 'Utilisateur'}</h3>
+                      <div className="ar-review-rating">
                         {renderStars(review.rating || 0)}
                       </div>
                     </div>
                   </div>
-                  <div className={`review-status ${review.status?.toLowerCase()}`}>
+                  <div className={`ar-review-status ${review.status?.toLowerCase()}`}>
                     {review.status === 'PENDING' && '⏳ En attente'}
                     {review.status === 'APPROVED' && '✅ Approuvé'}
                     {review.status === 'REJECTED' && '❌ Rejeté'}
                   </div>
                 </div>
 
-                <div className="review-content">
-                  <p className="review-comment">{review.comment}</p>
+                <div className="ar-review-content">
+                  <p className="ar-review-comment">{review.comment}</p>
                 </div>
 
-                <div className="review-meta">
-                  <span className="review-item">
+                <div className="ar-review-meta">
+                  <span className="ar-review-item">
                     📍 {review.itemType}: {review.itemId}
                   </span>
-                  <span className="review-date">
+                  <span className="ar-review-date">
                     📅 {review.createdAt 
                       ? new Date(review.createdAt).toLocaleDateString('fr-FR')
                       : 'N/A'
@@ -159,16 +163,16 @@ function AdminReviews() {
                 </div>
 
                 {review.status === 'PENDING' && (
-                  <div className="review-actions">
+                  <div className="ar-review-actions">
                     <button
                       onClick={() => handleApprove(review.id)}
-                      className="btn-approve"
+                      className="ar-btn-approve"
                     >
                       ✅ Approuver
                     </button>
                     <button
                       onClick={() => handleReject(review.id)}
-                      className="btn-reject"
+                      className="ar-btn-reject"
                     >
                       ❌ Rejeter
                     </button>
@@ -177,7 +181,7 @@ function AdminReviews() {
 
                 <button
                   onClick={() => handleDelete(review.id)}
-                  className="btn-delete-review"
+                  className="ar-btn-delete-review"
                 >
                   🗑️ Supprimer
                 </button>

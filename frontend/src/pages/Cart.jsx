@@ -1,74 +1,84 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import cartService from '../services/cartService';
 import './Cart.css';
+import { Link } from 'react-router-dom';
 
 function Cart() {
-  const navigate = useNavigate();
   const [cart, setCart] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [cartItems, setCartItems] = useState([]);
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Charger le panier au démarrage
   useEffect(() => {
-    loadCart();
+    fetchCart();
   }, []);
 
-  const loadCart = async () => {
+  const fetchCart = async () => {
     try {
-      setLoading(true);
-      setError('');
+      setIsLoading(true);
       const data = await cartService.getCart();
       setCart(data);
-    } catch (err) {
-      console.error('Erreur:', err);
-      setError('Impossible de charger votre panier');
-      // Fallback to empty cart
-      setCart({ items: [], totalPrice: 0 });
+      setCartItems(data.items || []);
+    } catch (error) {
+      console.error('Erreur chargement panier:', error);
+      setCartItems([]);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleRemoveItem = async (index) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
-      return;
-    }
+  // Calculs
+  const subtotal = cart?.totalPrice || 0;
+  const promoDiscount = appliedPromo ? (subtotal * appliedPromo.discount) / 100 : 0;
+  const tax = (subtotal - promoDiscount) * 0.05; // 5% taxe
+  const total = subtotal - promoDiscount + tax;
 
+  const handleRemoveItem = async (index) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
+      try {
+        await cartService.removeItem(index);
+        await fetchCart(); // Refresh
+        alert('Article supprimé avec succès !');
+      } catch (error) {
+        console.error('Erreur suppression:', error);
+        alert('Erreur lors de la suppression: ' + error.message);
+      }
+    }
+  };
+
+  const handleUpdateQuantity = async (index, newQuantity) => {
     try {
-      await cartService.removeItem(index);
-      await loadCart();
-      alert('Article retiré du panier');
-    } catch (err) {
-      console.error('Erreur:', err);
-      alert('Erreur lors de la suppression');
+      const item = cart.items[index];
+      
+      const updatedItem = {
+        type: item.type,
+        itemId: item.itemId,
+        data: item.data,
+        price: item.price,
+        quantity: newQuantity 
+      };
+      
+      const updatedCart = await cartService.updateItem(index, updatedItem);
+      setCart(updatedCart);
+    } catch (error) {
+      console.error('Erreur mise à jour:', error);
+      alert('Erreur lors de la mise à jour');
     }
   };
 
   const handleClearCart = async () => {
-    if (!window.confirm('Voulez-vous vraiment vider le panier ?')) {
-      return;
-    }
-
-    try {
-      await cartService.clearCart();
-      await loadCart();
-      alert('Panier vidé');
-    } catch (err) {
-      console.error('Erreur:', err);
-      alert('Erreur lors du vidage du panier');
-    }
-  };
-
-  const handleUpdateQuantity = async (index, field, value) => {
-    try {
-      const item = cart.items[index];
-      const updatedItem = { ...item, [field]: Math.max(1, value) };
-      await cartService.updateItem(index, updatedItem);
-      await loadCart();
-    } catch (err) {
-      console.error('Erreur:', err);
+    if (window.confirm('Êtes-vous sûr de vouloir vider le panier ?')) {
+      try {
+        await cartService.clearCart();
+        await fetchCart(); // Refresh
+        alert('Panier vidé avec succès !');
+      } catch (error) {
+        console.error('Erreur vidage panier:', error);
+        alert('Erreur lors du vidage du panier: ' + error.message);
+      }
     }
   };
 
@@ -92,6 +102,7 @@ function Cart() {
     setPromoCode('');
   };
 
+
   const getItemIcon = (type) => {
     switch (type) {
       case 'flight': return '✈️';
@@ -110,35 +121,18 @@ function Cart() {
     }
   };
 
-  const calculateItemPrice = (item) => {
-    if (item.type === 'flight' && item.passengers) {
-      return item.price * item.passengers;
-    } else if (item.type === 'hotel' && item.nights && item.rooms) {
-      return (item.pricePerNight || item.price) * item.nights * item.rooms;
-    } else if (item.type === 'activity' && item.participants) {
-      return (item.pricePerPerson || item.price) * item.participants;
-    }
-    return item.price || 0;
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="cart-page">
         <div className="container">
-          <div className="loading-container">
+          <div className="loading-state">
             <div className="spinner"></div>
-            <p>Chargement de votre panier...</p>
+            <p>Chargement du panier...</p>
           </div>
         </div>
       </div>
     );
   }
-
-  const cartItems = cart?.items || [];
-  const subtotal = cartItems.reduce((sum, item) => sum + calculateItemPrice(item), 0);
-  const promoDiscount = appliedPromo ? (subtotal * appliedPromo.discount) / 100 : 0;
-  const tax = (subtotal - promoDiscount) * 0.05;
-  const total = subtotal - promoDiscount + tax;
 
   return (
     <div className="cart-page">
@@ -152,14 +146,12 @@ function Cart() {
           <p className="cart-subtitle">
             {cartItems.length} article{cartItems.length > 1 ? 's' : ''} dans votre panier
           </p>
+          {cartItems.length > 0 && (
+            <button onClick={handleClearCart} className="btn-clear-cart">
+              Vider le panier
+            </button>
+          )}
         </div>
-
-        {error && (
-          <div className="alert alert-error">
-            <span className="alert-icon">⚠️</span>
-            {error}
-          </div>
-        )}
 
         {cartItems.length > 0 ? (
           <div className="cart-layout">
@@ -169,7 +161,9 @@ function Cart() {
                 {cartItems.map((item, index) => (
                   <div key={index} className="cart-item">
                     <div className="cart-item-image">
-                      <img src={item.image || 'https://via.placeholder.com/400'} alt={item.title || item.name} />
+                      <div className="item-placeholder">
+                        <span className="placeholder-icon">{getItemIcon(item.type)}</span>
+                      </div>
                       <div className="item-type-badge">
                         <span className="type-icon">{getItemIcon(item.type)}</span>
                         <span>{getItemTypeLabel(item.type)}</span>
@@ -178,8 +172,13 @@ function Cart() {
 
                     <div className="cart-item-content">
                       <div className="cart-item-header">
-                        <h3 className="item-title">{item.title || item.name}</h3>
-                        <button 
+                        <h3 className="item-title">
+                          {item.type === 'flight' && 'Vol'}
+                          {item.type === 'hotel' && 'Hôtel'}
+                          {item.type === 'activity' && 'Activité'}
+                          {' - ID: ' + item.itemId}
+                        </h3>
+                        <button
                           className="btn-remove-item"
                           onClick={() => handleRemoveItem(index)}
                           title="Supprimer"
@@ -189,123 +188,22 @@ function Cart() {
                       </div>
 
                       <div className="cart-item-details">
-                        {item.type === 'flight' && (
-                          <>
-                            <div className="detail-row">
-                              <span className="detail-icon">🛫</span>
-                              <span>{item.airline}</span>
-                            </div>
-                            <div className="detail-row">
-                              <span className="detail-icon">📅</span>
-                              <span>
-                                {item.departure ? new Date(item.departure).toLocaleDateString('fr-FR') : ''} - 
-                                {item.departureTime} → {item.arrivalTime}
-                              </span>
-                            </div>
-                          </>
-                        )}
-
-                        {item.type === 'hotel' && (
-                          <>
-                            <div className="detail-row">
-                              <span className="detail-icon">📍</span>
-                              <span>{item.location}</span>
-                            </div>
-                            <div className="detail-row">
-                              <span className="detail-icon">📅</span>
-                              <span>
-                                Du {item.checkIn ? new Date(item.checkIn).toLocaleDateString('fr-FR') : ''} au{' '}
-                                {item.checkOut ? new Date(item.checkOut).toLocaleDateString('fr-FR') : ''}
-                              </span>
-                            </div>
-                          </>
-                        )}
-
-                        {item.type === 'activity' && (
-                          <>
-                            <div className="detail-row">
-                              <span className="detail-icon">📍</span>
-                              <span>{item.location}</span>
-                            </div>
-                            <div className="detail-row">
-                              <span className="detail-icon">📅</span>
-                              <span>
-                                {item.date ? new Date(item.date).toLocaleDateString('fr-FR') : ''} à {item.time}
-                              </span>
-                            </div>
-                          </>
-                        )}
+                        <div className="detail-row">
+                          <span className="detail-icon">📦</span>
+                          <span>Référence: {item.itemId}</span>
+                        </div>
+                        <div className="detail-row">
+                          <span className="detail-icon">📅</span>
+                          <span>Ajouté le: {new Date(item.addedAt).toLocaleDateString('fr-FR')}</span>
+                        </div>
                       </div>
 
                       <div className="cart-item-footer">
-                        <div className="item-quantity">
-                          {item.type === 'flight' && (
-                            <>
-                              <label>Passagers :</label>
-                              <div className="quantity-controls">
-                                <button 
-                                  onClick={() => handleUpdateQuantity(index, 'passengers', (item.passengers || 1) - 1)}
-                                  className="qty-btn"
-                                >
-                                  -
-                                </button>
-                                <span className="qty-value">{item.passengers || 1}</span>
-                                <button 
-                                  onClick={() => handleUpdateQuantity(index, 'passengers', (item.passengers || 1) + 1)}
-                                  className="qty-btn"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </>
-                          )}
-
-                          {item.type === 'hotel' && (
-                            <>
-                              <label>Chambres :</label>
-                              <div className="quantity-controls">
-                                <button 
-                                  onClick={() => handleUpdateQuantity(index, 'rooms', (item.rooms || 1) - 1)}
-                                  className="qty-btn"
-                                >
-                                  -
-                                </button>
-                                <span className="qty-value">{item.rooms || 1}</span>
-                                <button 
-                                  onClick={() => handleUpdateQuantity(index, 'rooms', (item.rooms || 1) + 1)}
-                                  className="qty-btn"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </>
-                          )}
-
-                          {item.type === 'activity' && (
-                            <>
-                              <label>Participants :</label>
-                              <div className="quantity-controls">
-                                <button 
-                                  onClick={() => handleUpdateQuantity(index, 'participants', (item.participants || 1) - 1)}
-                                  className="qty-btn"
-                                >
-                                  -
-                                </button>
-                                <span className="qty-value">{item.participants || 1}</span>
-                                <button 
-                                  onClick={() => handleUpdateQuantity(index, 'participants', (item.participants || 1) + 1)}
-                                  className="qty-btn"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </>
-                          )}
-                        </div>
-
                         <div className="item-price">
                           <span className="price-label">Prix :</span>
-                          <span className="price-value">{calculateItemPrice(item).toFixed(2)} DT</span>
+                          <span className="price-value">
+                            {(item.price * item.quantity).toFixed(2)} {cart.currency}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -339,7 +237,7 @@ function Cart() {
                         placeholder="Entrez votre code"
                         className="promo-input"
                       />
-                      <button 
+                      <button
                         onClick={handleApplyPromo}
                         className="btn-apply-promo"
                         disabled={!promoCode}
@@ -353,7 +251,7 @@ function Cart() {
                         <span className="promo-icon">🎉</span>
                         <span className="promo-name">{appliedPromo.name}</span>
                       </div>
-                      <button 
+                      <button
                         onClick={handleRemovePromo}
                         className="btn-remove-promo"
                       >
@@ -367,43 +265,32 @@ function Cart() {
                 <div className="price-breakdown">
                   <div className="price-row">
                     <span>Sous-total</span>
-                    <span>{subtotal.toFixed(2)} DT</span>
+                    <span>{subtotal.toFixed(2)} {cart.currency}</span>
                   </div>
 
                   {appliedPromo && (
                     <div className="price-row discount">
                       <span>Réduction ({appliedPromo.discount}%)</span>
-                      <span>-{promoDiscount.toFixed(2)} DT</span>
+                      <span>-{promoDiscount.toFixed(2)} {cart.currency}</span>
                     </div>
                   )}
 
                   <div className="price-row">
                     <span>Taxes (5%)</span>
-                    <span>{tax.toFixed(2)} DT</span>
+                    <span>{tax.toFixed(2)} {cart.currency}</span>
                   </div>
 
                   <div className="price-row total">
                     <span>Total</span>
-                    <span className="total-amount">{total.toFixed(2)} DT</span>
+                    <span className="total-amount">{total.toFixed(2)} {cart.currency}</span>
                   </div>
                 </div>
 
                 {/* Checkout Button */}
-                <button 
-                  onClick={() => navigate('/order-summary')} 
-                  className="btn-checkout"
-                >
+                <Link to="/order-summary" className="btn-checkout">
                   <span>Procéder au paiement</span>
                   <span className="arrow-right">→</span>
-                </button>
-
-                {/* Clear Cart */}
-                <button 
-                  onClick={handleClearCart}
-                  className="btn-clear-cart"
-                >
-                  Vider le panier
-                </button>
+                </Link>
 
                 {/* Trust Badges */}
                 <div className="trust-badges">

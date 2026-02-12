@@ -4,39 +4,26 @@ import './Preferences.css';
 
 function Preferences() {
   const [preferences, setPreferences] = useState({
-    // Préférences de voyage
     travelClass: 'economy',
     seatPreference: 'window',
     mealPreference: 'standard',
-    
-    // Préférences d'hôtel
     hotelStars: [3, 4, 5],
     roomType: 'double',
     hotelAmenities: ['wifi', 'breakfast', 'parking'],
-    
-    // Budget
     budgetMin: 0,
     budgetMax: 5000,
-    
-    // Préférences générales
     preferredAirlines: ['Air France', 'Emirates'],
     destinations: ['Europe', 'Asie'],
-    
-    // Notifications
     emailNotifications: true,
     smsNotifications: false,
     priceAlerts: true,
     promotions: true,
     newsletter: true,
-    
-    // Langue et devise
     language: 'fr',
     currency: 'EUR'
   });
 
   const [frequentTravelers, setFrequentTravelers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [showAddTraveler, setShowAddTraveler] = useState(false);
   const [newTraveler, setNewTraveler] = useState({
     firstName: '',
@@ -45,28 +32,35 @@ function Preferences() {
     passportNumber: ''
   });
 
-  // Charger les préférences au montage
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Charger les préférences au démarrage
   useEffect(() => {
-    loadPreferences();
+    fetchPreferences();
   }, []);
 
-  const loadPreferences = async () => {
+  const fetchPreferences = async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const data = await preferencesService.getPreferences();
-      
+     
       // Fusionner avec les valeurs par défaut
-      setPreferences(prev => ({ ...prev, ...data }));
-      
-      // Charger les voyageurs fréquents si disponibles
+      setPreferences(prevPrefs => ({
+        ...prevPrefs,
+        ...data
+      }));
+     
+      // Charger les voyageurs fréquents
       if (data.frequentTravelers) {
         setFrequentTravelers(data.frequentTravelers);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des préférences:', error);
-      // Garder les valeurs par défaut en cas d'erreur
+      console.error('Erreur chargement préférences:', error);
+      // On garde les valeurs par défaut si erreur
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -93,64 +87,81 @@ function Preferences() {
   };
 
   const handleAddTraveler = async () => {
-    if (!newTraveler.firstName || !newTraveler.lastName) {
-      alert('Veuillez remplir au moins le prénom et le nom');
-      return;
-    }
+    if (newTraveler.firstName && newTraveler.lastName) {
+      try {
+        // Ajouter localement
+        const updatedTravelers = [
+          ...frequentTravelers,
+          { ...newTraveler, id: Date.now() }
+        ];
+        setFrequentTravelers(updatedTravelers);
 
-    try {
-      const addedTraveler = await preferencesService.addFrequentTraveler(newTraveler);
-      setFrequentTravelers([...frequentTravelers, addedTraveler]);
-      setNewTraveler({
-        firstName: '',
-        lastName: '',
-        dateOfBirth: '',
-        passportNumber: ''
-      });
-      setShowAddTraveler(false);
-      alert('Voyageur ajouté avec succès !');
-    } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de l\'ajout du voyageur');
+        // Sauvegarder sur le backend
+        await preferencesService.updatePreferences({
+          ...preferences,
+          frequentTravelers: updatedTravelers
+        });
+
+        setNewTraveler({
+          firstName: '',
+          lastName: '',
+          dateOfBirth: '',
+          passportNumber: ''
+        });
+        setShowAddTraveler(false);
+        alert('Voyageur ajouté avec succès !');
+      } catch (error) {
+        console.error('Erreur ajout voyageur:', error);
+        alert('Erreur lors de l\'ajout du voyageur');
+      }
     }
   };
 
-  const handleRemoveTraveler = async (index) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce voyageur ?')) {
-      return;
-    }
+  const handleRemoveTraveler = async (id) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce voyageur ?')) {
+      try {
+        const updatedTravelers = frequentTravelers.filter(t => t.id !== id);
+        setFrequentTravelers(updatedTravelers);
 
-    try {
-      await preferencesService.removeFrequentTraveler(index);
-      setFrequentTravelers(frequentTravelers.filter((_, i) => i !== index));
-      alert('Voyageur supprimé');
-    } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de la suppression');
+        // Sauvegarder sur le backend
+        await preferencesService.updatePreferences({
+          ...preferences,
+          frequentTravelers: updatedTravelers
+        });
+
+        alert('Voyageur supprimé avec succès !');
+      } catch (error) {
+        console.error('Erreur suppression voyageur:', error);
+        alert('Erreur lors de la suppression du voyageur');
+      }
     }
   };
 
   const handleSavePreferences = async () => {
     try {
-      setSaving(true);
+      setIsSaving(true);
+      setError(null);
+
       await preferencesService.updatePreferences({
         ...preferences,
         frequentTravelers
       });
-      alert('Préférences enregistrées avec succès !');
+
+      alert('Préférences enregistrées avec succès ! ✅');
     } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de l\'enregistrement des préférences');
+      console.error('Erreur sauvegarde:', error);
+      setError('Erreur lors de la sauvegarde des préférences');
+      alert('❌ Erreur lors de la sauvegarde');
     } finally {
-      setSaving(false);
+      setIsSaving(false);
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="preferences-page">
         <div className="container">
-          <div className="loading-container">
+          <div className="loading-state">
             <div className="spinner"></div>
             <p>Chargement de vos préférences...</p>
           </div>
@@ -170,15 +181,21 @@ function Preferences() {
               Personnalisez votre expérience de voyage
             </p>
           </div>
-          <button 
-            className="btn-save-all" 
+          <button
+            className="btn-save-all"
             onClick={handleSavePreferences}
-            disabled={saving}
+            disabled={isSaving}
           >
             <span className="save-icon">💾</span>
-            {saving ? 'Enregistrement...' : 'Enregistrer tout'}
+            {isSaving ? 'Enregistrement...' : 'Enregistrer tout'}
           </button>
         </div>
+
+        {error && (
+          <div className="alert alert-error">
+            {error}
+          </div>
+        )}
 
         {/* Content */}
         <div className="preferences-content">
@@ -347,7 +364,7 @@ function Preferences() {
               </div>
             </div>
             <div className="budget-display">
-              Budget : {preferences.budgetMin} DT - {preferences.budgetMax} DT
+              Budget : {preferences.budgetMin}DT - {preferences.budgetMax}DT
             </div>
           </div>
 
@@ -456,14 +473,14 @@ function Preferences() {
                 <div className="form-grid">
                   <input
                     type="text"
-                    placeholder="Prénom *"
+                    placeholder="Prénom"
                     value={newTraveler.firstName}
                     onChange={(e) => setNewTraveler({ ...newTraveler, firstName: e.target.value })}
                     className="pref-input"
                   />
                   <input
                     type="text"
-                    placeholder="Nom *"
+                    placeholder="Nom"
                     value={newTraveler.lastName}
                     onChange={(e) => setNewTraveler({ ...newTraveler, lastName: e.target.value })}
                     className="pref-input"
@@ -495,41 +512,33 @@ function Preferences() {
             )}
 
             <div className="travelers-list">
-              {frequentTravelers.map((traveler, index) => (
-                <div key={index} className="traveler-card">
-                  <div className="traveler-avatar">
-                    <span className="traveler-icon">👤</span>
-                  </div>
-                  <div className="traveler-info">
-                    <h4 className="traveler-name">
-                      {traveler.firstName} {traveler.lastName}
-                    </h4>
-                    {traveler.dateOfBirth && (
+              {frequentTravelers.length === 0 ? (
+                <p className="empty-state">Aucun voyageur fréquent enregistré</p>
+              ) : (
+                frequentTravelers.map(traveler => (
+                  <div key={traveler.id} className="traveler-card">
+                    <div className="traveler-avatar">
+                      <span className="traveler-icon">👤</span>
+                    </div>
+                    <div className="traveler-info">
+                      <h4 className="traveler-name">
+                        {traveler.firstName} {traveler.lastName}
+                      </h4>
                       <p className="traveler-details">
                         Né(e) le {new Date(traveler.dateOfBirth).toLocaleDateString('fr-FR')}
                       </p>
-                    )}
-                    {traveler.passportNumber && (
                       <p className="traveler-passport">
                         Passeport: {traveler.passportNumber}
                       </p>
-                    )}
+                    </div>
+                    <button
+                      className="btn-remove-traveler"
+                      onClick={() => handleRemoveTraveler(traveler.id)}
+                    >
+                      <span className="remove-icon">🗑️</span>
+                    </button>
                   </div>
-                  <button
-                    className="btn-remove-traveler"
-                    onClick={() => handleRemoveTraveler(index)}
-                  >
-                    <span className="remove-icon">🗑️</span>
-                  </button>
-                </div>
-              ))}
-              {frequentTravelers.length === 0 && (
-                <div className="empty-travelers">
-                  <p>Aucun voyageur enregistré</p>
-                  <p className="empty-travelers-hint">
-                    Ajoutez vos voyageurs fréquents pour gagner du temps lors de vos réservations
-                  </p>
-                </div>
+                ))
               )}
             </div>
           </div>

@@ -39,6 +39,31 @@ const authService = {
     }
   },
 
+  // Mot de passe oublié
+  forgotPassword: async (email) => {
+    try {
+      const response = await apiService.post(config.API_ENDPOINTS.AUTH.FORGOT_PASSWORD, {
+        email
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
+  // Réinitialiser le mot de passe
+  resetPassword: async (token, newPassword) => {
+    try {
+      const response = await apiService.post(config.API_ENDPOINTS.AUTH.RESET_PASSWORD, {
+        token,
+        newPassword
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
+
   // Déconnexion
   logout: () => {
     localStorage.removeItem(config.STORAGE_KEYS.AUTH_TOKEN);
@@ -52,7 +77,7 @@ const authService = {
   },
 
   // Récupérer l'utilisateur actuel
-    getCurrentUser: () => {
+  getCurrentUser: () => {
     const userData = localStorage.getItem(config.STORAGE_KEYS.USER_DATA);
     return userData ? JSON.parse(userData) : null;
   },
@@ -62,6 +87,7 @@ const authService = {
     return localStorage.getItem(config.STORAGE_KEYS.AUTH_TOKEN);
   }
 };
+
 // Liste des callbacks à prévenir lors d'un changement d'auth
 let listeners = [];
 
@@ -89,6 +115,5 @@ authService.logout = () => {
   originalLogout();
   listeners.forEach(cb => cb(null)); // Notifie les composants
 };
-
 
 export default authService;

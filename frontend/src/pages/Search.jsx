@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react'; // MODIFIÉ : Ajout useEffect
-import { useNavigate, useLocation } from 'react-router-dom'; // MODIFIÉ : Ajout useLocation
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import searchService from '../services/searchService';
 import './Search.css';
 
 function Search() {
   const navigate = useNavigate();
-  const location = useLocation(); // AJOUT
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('flights');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // État pour les recherches de vols
   const [flightSearch, setFlightSearch] = useState({
@@ -35,17 +37,15 @@ function Search() {
     participants: 1
   });
 
-  // AJOUT : Récupérer les données du HeroSection au chargement
+  // Récupérer les données du HeroSection au chargement
   useEffect(() => {
     if (location.state?.searchType) {
-      // Changer l'onglet actif selon le type de recherche
       setActiveTab(location.state.searchType);
     }
 
     if (location.state?.searchData) {
       const data = location.state.searchData;
 
-      // Pré-remplir les champs selon le type
       if (location.state.searchType === 'flights') {
         setFlightSearch({
           from: data.from || '',
@@ -77,27 +77,45 @@ function Search() {
   const handleFlightChange = (e) => {
     const { name, value } = e.target;
     setFlightSearch(prev => ({ ...prev, [name]: value }));
+    setError('');
   };
 
   const handleHotelChange = (e) => {
     const { name, value } = e.target;
     setHotelSearch(prev => ({ ...prev, [name]: value }));
+    setError('');
   };
 
   const handleActivityChange = (e) => {
     const { name, value } = e.target;
     setActivitySearch(prev => ({ ...prev, [name]: value }));
+    setError('');
   };
 
   const handleFlightSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     
     try {
-      const queryParams = new URLSearchParams(flightSearch).toString();
-      navigate(`/search/flights/results?${queryParams}`);
-    } catch (error) {
-      console.error('Erreur de recherche:', error);
+      console.log('🔍 Recherche de vols avec:', flightSearch);
+      
+      // Appeler l'API via searchService
+      const results = await searchService.searchFlights(flightSearch);
+      
+      console.log('✅ Résultats reçus:', results);
+      
+      // Naviguer vers la page de résultats avec les données
+      navigate('/search/flights/results', {
+        state: {
+          results: results,
+          searchParams: flightSearch
+        }
+      });
+      
+    } catch (err) {
+      console.error('❌ Erreur de recherche:', err);
+      setError(err.message || 'Erreur lors de la recherche des vols');
     } finally {
       setIsLoading(false);
     }
@@ -106,12 +124,27 @@ function Search() {
   const handleHotelSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     
     try {
-      const queryParams = new URLSearchParams(hotelSearch).toString();
-      navigate(`/search/hotels/results?${queryParams}`);
-    } catch (error) {
-      console.error('Erreur de recherche:', error);
+      console.log('🏨 Recherche d\'hôtels avec:', hotelSearch);
+      
+      // Appeler l'API via searchService
+      const results = await searchService.searchHotels(hotelSearch);
+      
+      console.log('✅ Résultats reçus:', results);
+      
+      // Naviguer vers la page de résultats avec les données
+      navigate('/search/hotels/results', {
+        state: {
+          results: results,
+          searchParams: hotelSearch
+        }
+      });
+      
+    } catch (err) {
+      console.error('❌ Erreur de recherche:', err);
+      setError(err.message || 'Erreur lors de la recherche des hôtels');
     } finally {
       setIsLoading(false);
     }
@@ -120,12 +153,27 @@ function Search() {
   const handleActivitySubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     
     try {
-      const queryParams = new URLSearchParams(activitySearch).toString();
-      navigate(`/search/activities/results?${queryParams}`);
-    } catch (error) {
-      console.error('Erreur de recherche:', error);
+      console.log('🎯 Recherche d\'activités avec:', activitySearch);
+      
+      // Appeler l'API via searchService
+      const results = await searchService.searchActivities(activitySearch);
+      
+      console.log('✅ Résultats reçus:', results);
+      
+      // Naviguer vers la page de résultats avec les données
+      navigate('/search/activities/results', {
+        state: {
+          results: results,
+          searchParams: activitySearch
+        }
+      });
+      
+    } catch (err) {
+      console.error('❌ Erreur de recherche:', err);
+      setError(err.message || 'Erreur lors de la recherche des activités');
     } finally {
       setIsLoading(false);
     }
@@ -145,6 +193,14 @@ function Search() {
       <div className="search-container">
         <div className="container">
           <div className="search-card">
+            {/* Messages d'erreur */}
+            {error && (
+              <div className="alert alert-error">
+                <span className="alert-icon">⚠️</span>
+                {error}
+              </div>
+            )}
+
             {/* Tabs de navigation */}
             <div className="search-tabs">
               <button
@@ -266,7 +322,14 @@ function Search() {
                   className="btn btn-primary btn-search"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Recherche en cours...' : 'Rechercher des vols'}
+                  {isLoading ? (
+                    <>
+                      <span className="spinner-small"></span>
+                      Recherche en cours...
+                    </>
+                  ) : (
+                    'Rechercher des vols'
+                  )}
                 </button>
               </form>
             )}
@@ -353,7 +416,14 @@ function Search() {
                   className="btn btn-primary btn-search"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Recherche en cours...' : 'Rechercher des hôtels'}
+                  {isLoading ? (
+                    <>
+                      <span className="spinner-small"></span>
+                      Recherche en cours...
+                    </>
+                  ) : (
+                    'Rechercher des hôtels'
+                  )}
                 </button>
               </form>
             )}
@@ -429,7 +499,14 @@ function Search() {
                   className="btn btn-primary btn-search"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Recherche en cours...' : 'Rechercher des activités'}
+                  {isLoading ? (
+                    <>
+                      <span className="spinner-small"></span>
+                      Recherche en cours...
+                    </>
+                  ) : (
+                    'Rechercher des activités'
+                  )}
                 </button>
               </form>
             )}

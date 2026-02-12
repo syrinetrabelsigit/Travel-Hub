@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
-import './ReviewCard.css';
-import authService from '../../services/authService';
 import reviewService from '../../services/reviewService';
+import authService from '../../services/authService';
+import './ReviewCard.css';
 
 function ReviewCard({ review, onDelete }) {
-  const [helpful, setHelpful] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isVoting, setIsVoting] = useState(false);
   const currentUser = authService.getCurrentUser();
-  const isOwner = currentUser && currentUser.email === review.authorEmail;
+  const isMyReview = currentUser && review.userId === currentUser.id;
 
-  const handleHelpful = () => {
-    setHelpful(helpful + 1);
+  const handleVote = async (helpful) => {
+    if (isVoting) return;
+
+    try {
+      setIsVoting(true);
+      await reviewService.voteHelpful(review.id, helpful);
+      window.location.reload();
+    } catch (error) {
+      console.error('Erreur vote:', error);
+      alert('❌ Erreur lors du vote');
+    } finally {
+      setIsVoting(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -18,71 +28,89 @@ function ReviewCard({ review, onDelete }) {
       return;
     }
 
-    setIsDeleting(true);
     try {
       await reviewService.deleteReview(review.id);
-      onDelete(review.id);
+      alert('✅ Avis supprimé avec succès !');
+      
+      if (onDelete) {
+        onDelete(review.id);
+      }
     } catch (error) {
-      alert('Erreur lors de la suppression de l\'avis');
-    } finally {
-      setIsDeleting(false);
+      console.error('Erreur suppression:', error);
+      alert('❌ Erreur lors de la suppression');
     }
   };
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  const renderStars = (rating) => {
+    return (
+      <div className="rc-stars">
+        {[1, 2, 3, 4, 5].map(star => (
+          <span 
+            key={star} 
+            className={star <= rating ? 'rc-star-filled' : 'rc-star-empty'}
+          >
+            ⭐
+          </span>
+        ))}
+      </div>
+    );
   };
 
   return (
-    <div className="review-card">
-      <div className="review-header">
-        <div className="author-info">
-          <div className="author-avatar">
-            {review.author?.charAt(0).toUpperCase() || '?'}
+    <div className="rc-card">
+      <div className="rc-header">
+        <div className="rc-user-info">
+          <div className="rc-avatar">
+            <span className="rc-avatar-icon">👤</span>
           </div>
-          <div className="author-details">
-            <h4 className="author-name">{review.author || 'Anonyme'}</h4>
-            <span className="review-date">{formatDate(review.date || new Date())}</span>
+          <div className="rc-user-details">
+            <div className="rc-user-name">
+              {review.userName || 'Utilisateur'}
+              {review.verified && (
+                <span className="rc-verified-badge">✓ Vérifié</span>
+              )}
+            </div>
+            <div className="rc-date">
+              {new Date(review.date || review.createdAt).toLocaleDateString('fr-FR')}
+            </div>
           </div>
         </div>
-        <div className="rating">
-          <div className="rating-stars">
-            {'⭐'.repeat(review.rating)}
-          </div>
-          <span className="rating-value">{review.rating}/5</span>
+        <div className="rc-rating">
+          {renderStars(review.rating)}
+          <span className="rc-rating-value">
+            {review.rating}/5
+          </span>
         </div>
       </div>
 
-      <div className="review-content">
-        <p className="review-comment">{review.comment}</p>
-        
-        {review.images && review.images.length > 0 && (
-          <div className="review-images">
-            {review.images.map((img, index) => (
-              <img key={index} src={img} alt={`Photo ${index + 1}`} className="review-image" />
-            ))}
-          </div>
-        )}
+      <div className="rc-content">
+        <p className="rc-comment">{review.comment}</p>
       </div>
 
-      <div className="review-footer">
-        <button className="helpful-button" onClick={handleHelpful}>
-          <span className="helpful-icon">👍</span>
-          Utile ({helpful})
-        </button>
+      <div className="rc-footer">
+        <div className="rc-helpful">
+          <span className="rc-helpful-text">Utile ?</span>
+          <div className="rc-helpful-buttons">
+            <button
+              onClick={() => handleVote(true)}
+              className="rc-btn-helpful"
+              disabled={isVoting}
+            >
+              👍 {review.helpful > 0 && review.helpful}
+            </button>
+            <button
+              onClick={() => handleVote(false)}
+              className="rc-btn-not-helpful"
+              disabled={isVoting}
+            >
+              👎 {review.notHelpful > 0 && review.notHelpful}
+            </button>
+          </div>
+        </div>
 
-        {isOwner && (
-          <button 
-            className="delete-button" 
-            onClick={handleDelete}
-            disabled={isDeleting}
-          >
-            <span className="delete-icon">🗑️</span>
-            {isDeleting ? 'Suppression...' : 'Supprimer'}
+        {isMyReview && (
+          <button onClick={handleDelete} className="rc-btn-delete">
+            🗑️ Supprimer
           </button>
         )}
       </div>

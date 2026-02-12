@@ -26,7 +26,9 @@ const Login = () => {
 
     try {
       const response = await authService.login(formData.email, formData.password);
-      
+      // Récupérer l'URL de redirection sauvegardée
+      const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
+      localStorage.removeItem('redirectAfterLogin'); 
       // Rediriger selon le rôle
       if (response.user.role === "ADMIN") {
         navigate('/admin');

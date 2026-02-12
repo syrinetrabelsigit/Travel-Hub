@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import cartService from '../../services/cartService';
 import './ResultCard.css';
 
 function ResultCard({ result, searchType }) {
@@ -9,26 +10,49 @@ function ResultCard({ result, searchType }) {
     navigate(`/${searchType}/${result.id}`);
   };
 
-  const handleAddToCart = () => {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const cartItem = {
-      id: result.id,
-      type: searchType,
-      ...result,
-      addedAt: new Date().toISOString()
-    };
-    
-    cart.push(cartItem);
-    localStorage.setItem('cart', JSON.stringify(cart));
-    
-    alert('Ajouté au panier!');
+  const handleAddToCart = async () => {
+    try {
+      let itemPrice = 0;
+      
+      if (searchType === 'flights') {
+        itemPrice = result.price;
+      } else if (searchType === 'hotels') {
+        itemPrice = result.pricePerNight || result.price;
+      } else if (searchType === 'activities') {
+        itemPrice = result.price;
+      }
+
+      // ✅ Convertir en nombre et vérifier
+      const finalPrice = parseFloat(itemPrice);
+      
+      if (!finalPrice || finalPrice <= 0) {
+        alert('Prix invalide pour cet article');
+        return;
+      }
+
+      const cartItem = {
+        type: searchType.slice(0, -1), // "flights" → "flight"
+        itemId: result.id,
+        data: result,
+        price: finalPrice,
+        quantity: 1
+      };
+      
+      console.log('Ajout au panier:', cartItem); 
+      
+      await cartService.addItem(cartItem);
+      alert('Ajouté au panier avec succès ! 🎉');
+    } catch (error) {
+      console.error('Erreur ajout panier:', error);
+      alert('Erreur lors de l\'ajout au panier');
+    }
   };
 
   const renderFlightCard = () => (
     <div className="result-card flight-card">
       <div className="card-header">
         <div className="airline-info">
-          <img src={result.airlineLogo || 'https://via.placeholder.com/50'} alt={result.airline} className="airline-logo" />
+          <img src={result.airlineLogo} alt={result.airline} className="airline-logo" />
           <div>
             <h3 className="airline-name">{result.airline}</h3>
             <p className="flight-number">{result.flightNumber}</p>
@@ -83,7 +107,7 @@ function ResultCard({ result, searchType }) {
   const renderHotelCard = () => (
     <div className="result-card hotel-card">
       <div className="card-image">
-        <img src={result.image || 'https://via.placeholder.com/300x200'} alt={result.name} />
+        <img src={result.imageUrl} alt={result.name} className="hotel-image"/>
         {result.featured && <span className="badge-featured">Recommandé</span>}
       </div>
 
@@ -115,7 +139,7 @@ function ResultCard({ result, searchType }) {
             Voir les détails
           </button>
           <button onClick={handleAddToCart} className="btn btn-primary">
-            Réserver
+            Ajouter au panier
           </button>
         </div>
       </div>
