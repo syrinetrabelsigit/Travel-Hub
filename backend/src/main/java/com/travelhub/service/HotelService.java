@@ -112,15 +112,36 @@ public class HotelService {
     private String getHotelImage(String hotelName) {
         Map<String, String> images = new HashMap<>();
 
-        images.put("Hôtel Le Bristol Paris", "https://images.unsplash.com/photo-1566073771259-6a8506099945");
-        images.put("Pullman Paris Tour Eiffel", "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa");
-        images.put("Ibis Budget Paris La Villette", "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267");
-        images.put("Novotel Paris Les Halles", "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b");
-        images.put("Hôtel Lutetia", "https://images.unsplash.com/photo-1590490360182-c33d57733427");
+        // PARIS
+        images.put("Hôtel Le Bristol Paris", "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800");
+        images.put("Pullman Paris Tour Eiffel", "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800");
+        images.put("Ibis Budget Paris La Villette", "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800");
+        images.put("Novotel Paris Les Halles", "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800");
+        images.put("Hôtel Lutetia", "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800");
 
-        // image par défaut si non trouvée
-        return images.getOrDefault(hotelName,
-                "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa");
+        // TUNIS
+        images.put("The Residence Tunis", "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800");
+        images.put("Movenpick Hotel du Lac Tunis", "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800");
+        images.put("Golden Tulip El Mechtel", "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800");
+        images.put("Sheraton Tunis Hotel", "https://images.unsplash.com/photo-1455587734955-081b22074882?w=800");
+        images.put("Dar El Medina", "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800");
+
+        // LONDON
+        images.put("The Savoy", "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800");
+        images.put("Premier Inn London Tower Bridge", "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800");
+        images.put("Hilton London Paddington", "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800");
+        images.put("citizenM Tower of London", "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800");
+        images.put("The Langham", "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800");
+
+        // ROME
+        images.put("Hotel Hassler Roma", "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=800");
+        images.put("NH Collection Roma Centro", "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800");
+        images.put("B&B Hotel Roma Trastevere", "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800");
+        images.put("Hotel Artemide", "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800");
+        images.put("Rome Cavalieri Waldorf Astoria", "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800");
+
+        // Image par défaut
+        return images.getOrDefault(hotelName, "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800");
     }
 
 }

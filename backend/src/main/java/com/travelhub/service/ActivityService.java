@@ -82,7 +82,49 @@ public class ActivityService {
         activity.put("rating", rating);
         activity.put("reviews", (int)(Math.random() * 500 + 100));
         activity.put("included", Arrays.asList("Guide francophone", "Entrées"));
+
+        // ✅ Ajouter l'image dans les deux champs pour compatibilité
+        String imageUrl = getActivityImage(name);
+        activity.put("imageUrl", imageUrl);
+        activity.put("image", imageUrl); // ✅ AJOUTER CE CHAMP AUSSI
+
         return activity;
+    }
+
+    // ✅ NOUVELLE MÉTHODE
+    private String getActivityImage(String activityName) {
+        Map<String, String> images = new HashMap<>();
+
+        // PARIS
+        images.put("Visite guidée du Musée du Louvre", "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800");
+        images.put("Tour Eiffel avec accès sommet", "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800");
+        images.put("Croisière sur la Seine", "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800");
+        images.put("Visite de Versailles", "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800");
+        images.put("Dégustation de vins français", "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800");
+
+        // TUNIS
+        images.put("Visite de la Médina de Tunis", "https://images.unsplash.com/photo-1546412414-e1885259563a?w=800");
+        images.put("Excursion à Sidi Bou Saïd", "https://images.unsplash.com/photo-1577647143143-c7e4d9db4b5e?w=800");
+        images.put("Safari désert du Sahara", "https://images.unsplash.com/photo-1509439581779-6298f75bf6e5?w=800");
+        images.put("Visite de Carthage", "https://images.unsplash.com/photo-1591825729269-caeb344f6df2?w=800");
+        images.put("Cuisine tunisienne traditionnelle", "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800");
+
+        // LONDON
+        images.put("British Museum Tour", "https://images.unsplash.com/photo-1529260830199-42c24126f198?w=800");
+        images.put("Tower of London", "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800");
+        images.put("Thames River Cruise", "https://images.unsplash.com/photo-1520986606214-8b456906c813?w=800");
+        images.put("Harry Potter Studio Tour", "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800");
+        images.put("London Eye", "https://images.unsplash.com/photo-1543832923-44667a44c804?w=800");
+
+        // ROME
+        images.put("Colosseum & Roman Forum", "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800");
+        images.put("Vatican Museums & Sistine Chapel", "https://images.unsplash.com/photo-1520768182668-ef5d00634f3c?w=800");
+        images.put("Cooking Class Italian Cuisine", "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800");
+        images.put("Trevi Fountain & Pantheon Walk", "https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=800");
+        images.put("Vespa Tour of Rome", "https://images.unsplash.com/photo-1569254343540-4e7d9c3f86c4?w=800");
+
+        // Image par défaut
+        return images.getOrDefault(activityName, "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800");
     }
 
     public Map<String, Object> getActivityById(String id) {

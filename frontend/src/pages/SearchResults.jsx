@@ -40,64 +40,129 @@ function SearchResults() {
   }, [results, filters, sortBy]);
 
   const applyFiltersAndSort = () => {
-    if (!results || results.length === 0) {
-      setFilteredResults([]);
-      return;
-    }
+  if (!results || results.length === 0) {
+    setFilteredResults([]);
+    return;
+  }
 
-    let filtered = [...results];
+  let filtered = [...results];
 
-    // Application des filtres
+  console.log('🔍 Application des filtres:', filters);
+  console.log('📊 Résultats avant filtrage:', filtered.length);
+
+  // 1. Filtre par prix
+  filtered = filtered.filter(item => {
+    const itemPrice = item.price || item.pricePerNight || 0;
+    return itemPrice >= filters.priceMin && itemPrice <= filters.priceMax;
+  });
+  console.log('📊 Après filtre prix:', filtered.length);
+
+  // 2. Filtre par note
+  if (filters.rating > 0) {
     filtered = filtered.filter(item => {
-      // Filtre par prix
-      const itemPrice = item.price || item.pricePerNight || 0;
-      if (itemPrice < filters.priceMin || itemPrice > filters.priceMax) return false;
+      const itemRating = parseFloat(item.rating) || 0;
+      return itemRating >= filters.rating;
+    });
+    console.log('📊 Après filtre note:', filtered.length);
+  }
+
+  // 3. Filtre par escales (vols uniquement)
+  if (searchType === 'flights' && filters.stops !== 'all') {
+    filtered = filtered.filter(item => {
+      const itemStops = parseInt(item.stops) || 0;
       
-      // Filtre par note
-      const itemRating = item.rating || 0;
-      if (itemRating < filters.rating) return false;
-      
-      // Filtre par escales (vols uniquement)
-      if (filters.stops !== 'all' && searchType === 'flights') {
-        if (filters.stops === 'direct' && item.stops > 0) return false;
-        if (filters.stops === '1stop' && item.stops !== 1) return false;
+      if (filters.stops === 'direct') {
+        return itemStops === 0;
+      } else if (filters.stops === '1stop') {
+        return itemStops <= 1;
       }
       
       return true;
     });
+    console.log('📊 Après filtre escales:', filtered.length);
+  }
 
-    // Application du tri
-    switch (sortBy) {
-      case 'price_asc':
-        filtered.sort((a, b) => {
-          const priceA = a.price || a.pricePerNight || 0;
-          const priceB = b.price || b.pricePerNight || 0;
-          return priceA - priceB;
-        });
-        break;
-      case 'price_desc':
-        filtered.sort((a, b) => {
-          const priceA = a.price || a.pricePerNight || 0;
-          const priceB = b.price || b.pricePerNight || 0;
-          return priceB - priceA;
-        });
-        break;
-      case 'rating':
-        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-        break;
-      case 'duration':
-        if (searchType === 'flights') {
-          filtered.sort((a, b) => (a.duration || 0) - (b.duration || 0));
-        }
-        break;
-      default:
-        // recommended - ordre par défaut
-        break;
-    }
+  // 4. Filtre par équipements (hôtels uniquement)
+  if (searchType === 'hotels' && filters.amenities && filters.amenities.length > 0) {
+    filtered = filtered.filter(item => {
+      const itemAmenities = item.amenities || [];
+      
+      // Vérifier que l'hôtel a TOUS les équipements sélectionnés
+      return filters.amenities.every(amenity => {
+        // Mapper les valeurs du frontend vers le backend
+        const amenityMap = {
+          'wifi': 'WiFi',
+          'pool': 'Piscine',
+          'parking': 'Parking',
+          'ac': 'Climatisation',
+          'restaurant': 'Restaurant'
+        };
+        
+        const backendAmenity = amenityMap[amenity];
+        return itemAmenities.includes(backendAmenity);
+      });
+    });
+    console.log('📊 Après filtre équipements:', filtered.length);
+  }
 
-    console.log('📊 Résultats filtrés:', filtered.length, 'sur', results.length);
-    setFilteredResults(filtered);
-  };
+  // 5. Filtre par catégorie (activités uniquement)
+  if (searchType === 'activities' && filters.category && filters.category !== 'all') {
+    filtered = filtered.filter(item => {
+      return item.category?.toLowerCase() === filters.category.toLowerCase();
+    });
+    console.log('📊 Après filtre catégorie:', filtered.length);
+  }
+
+  // Application du tri
+  switch (sortBy) {
+    case 'price_asc':
+      filtered.sort((a, b) => {
+        const priceA = a.price || a.pricePerNight || 0;
+        const priceB = b.price || b.pricePerNight || 0;
+        return priceA - priceB;
+      });
+      break;
+    case 'price_desc':
+      filtered.sort((a, b) => {
+        const priceA = a.price || a.pricePerNight || 0;
+        const priceB = b.price || b.pricePerNight || 0;
+        return priceB - priceA;
+      });
+      break;
+    case 'rating':
+      filtered.sort((a, b) => {
+        const ratingA = parseFloat(a.rating) || 0;
+        const ratingB = parseFloat(b.rating) || 0;
+        return ratingB - ratingA;
+      });
+      break;
+    case 'duration':
+      if (searchType === 'flights') {
+        filtered.sort((a, b) => {
+          const durationA = parseDuration(a.duration);
+          const durationB = parseDuration(b.duration);
+          return durationA - durationB;
+        });
+      }
+      break;
+    default:
+      break;
+  }
+
+  console.log('✅ Résultats finaux après tri:', filtered.length);
+  setFilteredResults(filtered);
+};
+
+const parseDuration = (duration) => {
+  if (!duration) return 0;
+  const match = duration.match(/(\d+)h\s*(\d+)?m?/);
+  if (match) {
+    const hours = parseInt(match[1]) || 0;
+    const minutes = parseInt(match[2]) || 0;
+    return hours * 60 + minutes;
+  }
+  return 0;
+};
 
   const handleFilterChange = (newFilters) => {
     console.log('🔧 Nouveaux filtres:', newFilters);

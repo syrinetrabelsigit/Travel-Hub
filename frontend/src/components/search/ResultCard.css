@@ -1,4 +1,5 @@
-.result-card {
+/* RESULT CARD STYLES - Classes spécifiques */
+.rc-card {
   background: var(--bg-white);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-sm);
@@ -6,17 +7,17 @@
   overflow: hidden;
 }
 
-.result-card:hover {
+.rc-card:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
 }
 
 /* Flight Card Styles */
-.flight-card {
+.rc-flight-card {
   padding: var(--spacing-lg);
 }
 
-.card-header {
+.rc-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -25,87 +26,87 @@
   border-bottom: 2px solid var(--bg-light);
 }
 
-.airline-info {
+.rc-airline-info {
   display: flex;
   gap: var(--spacing-sm);
   align-items: center;
 }
 
-.airline-logo {
+.rc-airline-logo {
   width: 50px;
   height: 50px;
   object-fit: contain;
   border-radius: var(--border-radius);
 }
 
-.airline-name {
+.rc-airline-name {
   font-size: 1.1rem;
   font-weight: var(--font-weight-bold);
   color: var(--primary-dark);
   margin: 0;
 }
 
-.flight-number {
+.rc-flight-number {
   font-size: 0.9rem;
   color: var(--neutral-color);
   margin: 0;
 }
 
-.price-tag {
+.rc-price-tag {
   text-align: right;
 }
 
-.price {
+.rc-price {
   display: block;
   font-size: 1.75rem;
   font-weight: var(--font-weight-bold);
   color: var(--primary-color);
 }
 
-.price-label {
+.rc-price-label {
   font-size: 0.85rem;
   color: var(--neutral-color);
 }
 
-.flight-details {
+.rc-flight-details {
   margin-bottom: var(--spacing-md);
 }
 
-.flight-segment {
+.rc-flight-segment {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
   gap: var(--spacing-md);
   align-items: center;
 }
 
-.time-info {
+.rc-time-info {
   text-align: center;
 }
 
-.time {
+.rc-time {
   display: block;
   font-size: 1.5rem;
   font-weight: var(--font-weight-bold);
   color: var(--primary-dark);
 }
 
-.airport {
+.rc-airport {
   display: block;
   font-size: 0.9rem;
   color: var(--neutral-color);
   margin-top: 0.25rem;
 }
 
-.flight-duration {
+.rc-flight-duration {
   text-align: center;
 }
 
-.duration-line {
+.rc-duration-line {
   position: relative;
   margin-bottom: 0.5rem;
 }
 
-.duration-text {
+.rc-duration-text {
   font-size: 0.85rem;
   color: var(--neutral-color);
   background: var(--bg-white);
@@ -114,7 +115,7 @@
   z-index: 1;
 }
 
-.line {
+.rc-line {
   position: absolute;
   top: 50%;
   left: 0;
@@ -124,12 +125,12 @@
   z-index: 0;
 }
 
-.stops-info {
+.rc-stops-info {
   font-size: 0.85rem;
   color: var(--neutral-color);
 }
 
-.card-footer {
+.rc-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -137,32 +138,32 @@
   border-top: 1px solid var(--bg-light);
 }
 
-.rating {
+.rc-rating {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.stars {
+.rc-stars {
   color: #FCD34D;
 }
 
-.rating-value {
+.rc-rating-value {
   font-weight: var(--font-weight-bold);
   color: var(--primary-dark);
 }
 
-.reviews-count {
+.rc-reviews-count {
   font-size: 0.85rem;
   color: var(--neutral-color);
 }
 
-.card-actions {
+.rc-actions {
   display: flex;
   gap: var(--spacing-sm);
 }
 
-.btn {
+.rc-btn {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: var(--border-radius);
@@ -172,47 +173,47 @@
   font-size: 0.9rem;
 }
 
-.btn-primary {
+.rc-btn-primary {
   background: var(--primary-color);
   color: white;
 }
 
-.btn-primary:hover {
+.rc-btn-primary:hover {
   background: var(--primary-dark);
   transform: translateY(-1px);
 }
 
-.btn-secondary {
+.rc-btn-secondary {
   background: white;
   color: var(--primary-color);
   border: 2px solid var(--primary-color);
 }
 
-.btn-secondary:hover {
+.rc-btn-secondary:hover {
   background: var(--primary-color);
   color: white;
 }
 
 /* Hotel Card Styles */
-.hotel-card {
+.rc-hotel-card {
   display: grid;
   grid-template-columns: 300px 1fr;
   gap: var(--spacing-md);
 }
 
-.card-image {
+.rc-image {
   position: relative;
   height: 100%;
   min-height: 200px;
 }
 
-.card-image img {
+.rc-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.badge-featured {
+.rc-badge-featured {
   position: absolute;
   top: var(--spacing-sm);
   left: var(--spacing-sm);
@@ -224,62 +225,93 @@
   font-weight: var(--font-weight-bold);
 }
 
-.card-content {
+.rc-content {
   padding: var(--spacing-md);
   display: flex;
   flex-direction: column;
 }
 
-.hotel-header {
+.rc-hotel-header {
   display: flex;
   justify-content: space-between;
   margin-bottom: var(--spacing-md);
 }
 
-.hotel-name {
+.rc-hotel-name {
   font-size: 1.25rem;
   font-weight: var(--font-weight-bold);
   color: var(--primary-dark);
   margin: 0 0 0.5rem 0;
 }
 
-.hotel-location {
+.rc-hotel-location {
   color: var(--neutral-color);
   margin: 0 0 0.5rem 0;
 }
 
-.hotel-rating {
+.rc-hotel-rating {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.price-section {
+.rc-price-section {
   text-align: right;
 }
 
-.amenities {
+.rc-amenities {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: var(--spacing-md);
 }
 
-.amenity-tag {
+.rc-amenity-tag {
   padding: 0.25rem 0.75rem;
   background: var(--bg-light);
   border-radius: var(--border-radius);
   font-size: 0.85rem;
   color: var(--neutral-color);
 }
-
-/* Activity Card Styles */
-.activity-card {
-  display: flex;
-  flex-direction: column;
+/* Activity Card Styles - COMME LES HÔTELS */
+.rc-activity-card {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--spacing-md);
+  background: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
 }
 
-.category-badge {
+.rc-activity-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Image - COMME LES HÔTELS */
+.rc-activity-card .rc-image {
+  position: relative;
+  height: 100%;
+  min-height: 220px;
+  max-height: 280px;
+  overflow: hidden;
+}
+
+.rc-activity-card .rc-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.rc-activity-card:hover .rc-image img {
+  transform: scale(1.05);
+}
+
+/* Badge Catégorie - À DROITE COMME DANS L'ACTIVITÉ */
+.rc-category-badge {
   position: absolute;
   top: var(--spacing-sm);
   right: var(--spacing-sm);
@@ -289,63 +321,177 @@
   border-radius: var(--border-radius);
   font-size: 0.85rem;
   font-weight: var(--font-weight-bold);
+  z-index: 2;
+  box-shadow: var(--shadow-sm);
 }
 
-.activity-title {
-  font-size: 1.25rem;
+/* Contenu - COMME LES HÔTELS */
+.rc-activity-card .rc-content {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+/* Titre */
+.rc-activity-title {
+  font-size: 1.35rem;
   font-weight: var(--font-weight-bold);
   color: var(--primary-dark);
-  margin: 0 0 var(--spacing-sm) 0;
+  margin: 0 0 var(--spacing-xs) 0;
+  line-height: 1.3;
 }
 
-.activity-description {
+/* Description */
+.rc-activity-description {
   color: var(--neutral-color);
-  margin-bottom: var(--spacing-md);
-  line-height: 1.6;
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.5;
+  font-size: 0.95rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.activity-info {
+/* Info Box - STYLE COMME LES AMENITIES DES HÔTELS */
+.rc-activity-info {
   display: flex;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: var(--spacing-sm) 0 var(--spacing-md);
   padding: var(--spacing-md);
   background: var(--bg-light);
   border-radius: var(--border-radius);
 }
 
-.info-item {
+.rc-info-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   color: var(--neutral-color);
   font-size: 0.9rem;
+  background: white;
+  padding: 0.4rem 1rem;
+  border-radius: 30px;
+  box-shadow: var(--shadow-xs);
 }
 
-.info-item .icon {
-  font-size: 1.2rem;
+.rc-info-item .rc-icon {
+  font-size: 1.1rem;
 }
 
-.btn-full {
+/* Footer - COMME LES HÔTELS */
+.rc-activity-card .rc-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--spacing-md);
+  margin-top: auto;
+  border-top: 1px solid var(--bg-light);
+}
+
+/* Rating - COMME LES HÔTELS */
+.rc-activity-card .rc-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rc-activity-card .rc-stars {
+  color: #FCD34D;
+  font-size: 0.95rem;
+}
+
+.rc-activity-card .rc-rating-value {
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-dark);
+  font-size: 0.95rem;
+}
+
+.rc-activity-card .rc-reviews-count {
+  font-size: 0.8rem;
+  color: var(--neutral-color);
+}
+
+/* Prix - COMME LES HÔTELS */
+.rc-activity-card .rc-price-section {
+  text-align: right;
+}
+
+.rc-activity-card .rc-price {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+  line-height: 1.2;
+}
+
+/* Actions - BOUTONS CÔTE À CÔTE COMME LES HÔTELS */
+.rc-activity-card .rc-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
   width: 100%;
-  margin-top: 0.5rem;
 }
 
+.rc-btn-full {
+  width: 100%;
+  padding: 0.75rem 1rem !important;
+  margin-top: 0;
+}
+
+/* RESPONSIVE - COMME LES HÔTELS */
 @media (max-width: 968px) {
-  .hotel-card {
+  .rc-activity-card {
     grid-template-columns: 1fr;
   }
-
-  .flight-segment {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
+  
+  .rc-activity-card .rc-image {
+    height: 200px;
+    min-height: 200px;
   }
+  
+  .rc-activity-card .rc-content {
+    padding: var(--spacing-md);
+  }
+}
 
-  .card-actions {
+@media (max-width: 768px) {
+  .rc-activity-card .rc-image {
+    height: 180px;
+    min-height: 180px;
+  }
+  
+  .rc-activity-info {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .rc-info-item {
+    width: 100%;
+  }
+  
+  .rc-activity-card .rc-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .rc-activity-card .rc-price-section {
+    text-align: left;
+    width: 100%;
+  }
+  
+  .rc-activity-card .rc-actions {
     flex-direction: column;
     width: 100%;
   }
+}
 
-  .card-actions .btn {
-    width: 100%;
+@media (max-width: 480px) {
+  .rc-activity-card .rc-image {
+    height: 160px;
+    min-height: 160px;
   }
 }

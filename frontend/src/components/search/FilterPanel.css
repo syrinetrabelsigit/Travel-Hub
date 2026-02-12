@@ -1,11 +1,12 @@
-.filter-panel {
+/* FILTER PANEL STYLES - Classes spécifiques */
+.fp-panel {
   background: var(--bg-white);
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
 }
 
-.filter-header {
+.fp-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -14,14 +15,14 @@
   border-bottom: 2px solid var(--bg-light);
 }
 
-.filter-title {
+.fp-title {
   font-size: 1.25rem;
   font-weight: var(--font-weight-bold);
   color: var(--primary-dark);
   margin: 0;
 }
 
-.reset-btn {
+.fp-reset-btn {
   background: none;
   border: none;
   color: var(--primary-color);
@@ -31,59 +32,63 @@
   transition: color 0.3s ease;
 }
 
-.reset-btn:hover {
+.fp-reset-btn:hover {
   color: var(--primary-dark);
   text-decoration: underline;
 }
 
-.filter-section {
+.fp-section {
   margin-bottom: var(--spacing-lg);
   padding-bottom: var(--spacing-lg);
   border-bottom: 1px solid var(--bg-light);
 }
 
-.filter-section:last-of-type {
+.fp-section:last-of-type {
   border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
-.filter-section-title {
+.fp-section-title {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--primary-dark);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
 }
 
 /* Prix */
-.price-inputs {
+.fp-price-inputs {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
 }
 
-.price-input {
+.fp-price-input {
   flex: 1;
-  padding: 0.5rem;
+  padding: 0.6rem 0.75rem;
   border: 2px solid #E5E7EB;
   border-radius: var(--border-radius);
   font-size: 0.9rem;
+  transition: all 0.2s ease;
 }
 
-.price-input:focus {
+.fp-price-input:focus {
   outline: none;
   border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
 }
 
-.price-separator {
+.fp-price-separator {
   color: var(--neutral-color);
   font-weight: bold;
 }
 
-.price-range {
+.fp-price-range {
   margin-top: var(--spacing-sm);
 }
 
-.price-slider {
+.fp-price-slider {
   width: 100%;
   height: 6px;
   border-radius: 3px;
@@ -92,7 +97,7 @@
   -webkit-appearance: none;
 }
 
-.price-slider::-webkit-slider-thumb {
+.fp-price-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 18px;
@@ -100,18 +105,33 @@
   border-radius: 50%;
   background: var(--primary-color);
   cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid white;
+  box-shadow: var(--shadow-sm);
 }
 
-.price-slider::-moz-range-thumb {
+.fp-price-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  background: var(--primary-dark);
+}
+
+.fp-price-slider::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
   background: var(--primary-color);
   cursor: pointer;
-  border: none;
+  border: 2px solid white;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
 }
 
-.price-labels {
+.fp-price-slider::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  background: var(--primary-dark);
+}
+
+.fp-price-labels {
   display: flex;
   justify-content: space-between;
   margin-top: var(--spacing-xs);
@@ -120,84 +140,120 @@
 }
 
 /* Select */
-.filter-select {
+.fp-select {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.6rem 0.75rem;
   border: 2px solid #E5E7EB;
   border-radius: var(--border-radius);
   font-size: 0.9rem;
   cursor: pointer;
   background: white;
+  transition: all 0.2s ease;
 }
 
-.filter-select:focus {
+.fp-select:focus {
   outline: none;
   border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
 }
 
-/* Options Radio */
-.filter-options {
+/* Options Radio - CORRECTION ALIGNEMENT */
+.fp-options {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: 0.5rem;
 }
 
-.filter-option {
+.fp-option {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
   border-radius: var(--border-radius);
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
-.filter-option:hover {
+.fp-option:hover {
   background: var(--bg-light);
+  border-color: var(--primary-light);
 }
 
-.filter-option input[type="radio"] {
-  cursor: pointer;
-}
-
-.filter-option span {
-  font-size: 0.9rem;
-  color: var(--primary-dark);
-}
-
-/* Checkboxes */
-.filter-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.filter-checkbox:hover {
-  background: var(--bg-light);
-}
-
-.filter-checkbox input[type="checkbox"] {
+.fp-option input[type="radio"] {
   width: 18px;
   height: 18px;
+  margin: 0;
   cursor: pointer;
+  accent-color: var(--primary-color);
+  flex-shrink: 0;
 }
 
-.filter-checkbox span {
-  font-size: 0.9rem;
-  color: var(--primary-dark);
+.fp-option span {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  line-height: 1.4;
 }
 
-.btn-full {
+/* Checkboxes - ALIGNEMENT CORRIGÉ */
+.fp-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.fp-checkbox:hover {
+  background: var(--bg-light);
+  border-color: var(--primary-light);
+}
+
+.fp-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.fp-checkbox span {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Bouton plein largeur */
+.fp-btn-full {
   width: 100%;
   margin-top: var(--spacing-md);
 }
 
+/* Responsive */
 @media (max-width: 968px) {
-  .filter-panel {
+  .fp-panel {
     margin-bottom: var(--spacing-lg);
   }
+}
+
+/* Animation */
+@keyframes fp-slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fp-section {
+  animation: fp-slideIn 0.3s ease-out;
 }

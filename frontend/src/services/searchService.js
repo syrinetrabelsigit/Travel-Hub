@@ -1,10 +1,10 @@
-import { apiService } from './api';
+import apiService from './apiService';
 
 const searchService = {
   /**
    * Rechercher des vols
    */
-  searchFlights: async (searchParams) => {
+  async searchFlights(searchParams) {
     try {
       // Adapter les paramètres au format attendu par le backend
       const params = {
@@ -20,32 +20,32 @@ const searchService = {
 
       const response = await apiService.post('/search/flights', params);
 
-      console.log('✅ Vols trouvés:', response.data);
-      return response.data;
+      console.log('✅ Vols trouvés:', response);
+      return response;
 
     } catch (error) {
       console.error('❌ Erreur recherche vols:', error);
-      throw error.response?.data || error;
+      throw error;
     }
   },
 
   /**
    * Obtenir les détails d'un vol par ID
    */
-  getFlightDetails: async (flightId) => {
+  async getFlightDetails(flightId) {
     try {
       const response = await apiService.get(`/search/flight/${flightId}`);
-      return response.data;
+      return response;
     } catch (error) {
       console.error('❌ Erreur détails vol:', error);
-      throw error.response?.data || error;
+      throw error;
     }
   },
 
   /**
    * Rechercher des hôtels
    */
-  searchHotels: async (searchParams) => {
+  async searchHotels(searchParams) {
     try {
       // Adapter les paramètres au format attendu par le backend
       const params = {
@@ -61,32 +61,32 @@ const searchService = {
 
       const response = await apiService.post('/search/hotels', params);
 
-      console.log('✅ Hôtels trouvés:', response.data);
-      return response.data;
+      console.log('✅ Hôtels trouvés:', response);
+      return response;
 
     } catch (error) {
       console.error('❌ Erreur recherche hôtels:', error);
-      throw error.response?.data || error;
+      throw error;
     }
   },
 
   /**
    * Obtenir les détails d'un hôtel par ID
    */
-  getHotelDetails: async (hotelId) => {
+  async getHotelDetails(hotelId) {
     try {
       const response = await apiService.get(`/search/hotel/${hotelId}`);
-      return response.data;
+      return response;
     } catch (error) {
       console.error('❌ Erreur détails hôtel:', error);
-      throw error.response?.data || error;
+      throw error;
     }
   },
 
   /**
    * Rechercher des activités
    */
-  searchActivities: async (searchParams) => {
+  async searchActivities(searchParams) {
     try {
       // Adapter les paramètres au format attendu par le backend
       const params = {
@@ -100,32 +100,32 @@ const searchService = {
 
       const response = await apiService.post('/search/activities', params);
 
-      console.log('✅ Activités trouvées:', response.data);
-      return response.data;
+      console.log('✅ Activités trouvées:', response);
+      return response;
 
     } catch (error) {
       console.error('❌ Erreur recherche activités:', error);
-      throw error.response?.data || error;
+      throw error;
     }
   },
 
   /**
    * Obtenir les détails d'une activité par ID
    */
-  getActivityDetails: async (activityId) => {
+  async getActivityDetails(activityId) {
     try {
       const response = await apiService.get(`/search/activity/${activityId}`);
-      return response.data;
+      return response;
     } catch (error) {
       console.error('❌ Erreur détails activité:', error);
-      throw error.response?.data || error;
+      throw error;
     }
   },
 
   /**
    * Recherche combinée (tous les types)
    */
-  searchAll: async (destination, dates) => {
+  async searchAll(destination, dates) {
     try {
       const [flights, hotels, activities] = await Promise.allSettled([
         searchService.searchFlights({

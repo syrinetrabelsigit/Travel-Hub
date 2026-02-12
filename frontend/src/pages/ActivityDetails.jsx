@@ -101,13 +101,11 @@ function ActivityDetails() {
         </div>
 
         {/* Image principale */}
-        <div className="activity-image-container">
-          <img 
-            src={activity.image || 'https://via.placeholder.com/1200x600'} 
-            alt={activity.title} 
-            className="activity-main-image"
-          />
-        </div>
+        <img 
+  src={activity.image || 'https://via.placeholder.com/1200x600'} 
+  alt={activity.title} 
+  className="activity-main-image"
+/>
 
         <div className="activity-content">
           <div className="content-main">

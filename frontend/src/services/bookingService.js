@@ -57,7 +57,7 @@ const bookingService = {
   downloadInvoice: async (id) => {
     try {
       const token = localStorage.getItem('travelhub_auth_token');
-      const response = await fetch(`http://localhost:8085/api/bookings/${id}/invoice`, {
+      const response = await fetch(`http://localhost:8080/api/bookings/${id}/invoice`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`

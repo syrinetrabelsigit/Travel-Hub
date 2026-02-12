@@ -15,6 +15,25 @@ function FilterPanel({ searchType, filters, onFilterChange }) {
     onFilterChange({ stops: e.target.value });
   };
 
+  const handleAmenityChange = (e) => {
+    const amenity = e.target.value;
+    const isChecked = e.target.checked;
+    
+    let newAmenities = [...(filters.amenities || [])];
+    
+    if (isChecked) {
+      newAmenities.push(amenity);
+    } else {
+      newAmenities = newAmenities.filter(a => a !== amenity);
+    }
+    
+    onFilterChange({ amenities: newAmenities });
+  };
+
+  const handleCategoryChange = (e) => {
+    onFilterChange({ category: e.target.value });
+  };
+
   const handleReset = () => {
     onFilterChange({
       priceMin: 0,
@@ -22,40 +41,41 @@ function FilterPanel({ searchType, filters, onFilterChange }) {
       rating: 0,
       stops: 'all',
       airlines: [],
-      amenities: []
+      amenities: [],
+      category: 'all'
     });
   };
 
   return (
-    <div className="filter-panel">
-      <div className="filter-header">
-        <h3 className="filter-title">Filtres</h3>
-        <button onClick={handleReset} className="reset-btn">Réinitialiser</button>
+    <div className="fp-panel">
+      <div className="fp-header">
+        <h3 className="fp-title">Filtres</h3>
+        <button onClick={handleReset} className="fp-reset-btn">Réinitialiser</button>
       </div>
       
       {/* Filtre Prix */}
-      <div className="filter-section">
-        <h4 className="filter-section-title">Prix (DT)</h4>
-        <div className="price-inputs">
+      <div className="fp-section">
+        <h4 className="fp-section-title">Prix (DT)</h4>
+        <div className="fp-price-inputs">
           <input
             type="number"
             name="priceMin"
             value={filters.priceMin}
             onChange={handlePriceChange}
             placeholder="Min"
-            className="price-input"
+            className="fp-price-input"
           />
-          <span className="price-separator">-</span>
+          <span className="fp-price-separator">-</span>
           <input
             type="number"
             name="priceMax"
             value={filters.priceMax}
             onChange={handlePriceChange}
             placeholder="Max"
-            className="price-input"
+            className="fp-price-input"
           />
         </div>
-        <div className="price-range">
+        <div className="fp-price-range">
           <input
             type="range"
             name="priceMax"
@@ -64,9 +84,9 @@ function FilterPanel({ searchType, filters, onFilterChange }) {
             step="100"
             value={filters.priceMax}
             onChange={handlePriceChange}
-            className="price-slider"
+            className="fp-price-slider"
           />
-          <div className="price-labels">
+          <div className="fp-price-labels">
             <span>0 DT</span>
             <span>10 000 DT</span>
           </div>
@@ -74,12 +94,12 @@ function FilterPanel({ searchType, filters, onFilterChange }) {
       </div>
 
       {/* Filtre Note */}
-      <div className="filter-section">
-        <h4 className="filter-section-title">Note minimum</h4>
+      <div className="fp-section">
+        <h4 className="fp-section-title">Note minimum</h4>
         <select
           value={filters.rating}
           onChange={handleRatingChange}
-          className="filter-select"
+          className="fp-select"
         >
           <option value="0">Toutes les notes</option>
           <option value="3">3+ ⭐</option>
@@ -89,12 +109,12 @@ function FilterPanel({ searchType, filters, onFilterChange }) {
         </select>
       </div>
 
-      {/* Filtre Escales (seulement pour les vols) */}
+      {/* Filtre Escales - CORRIGÉ */}
       {searchType === 'flights' && (
-        <div className="filter-section">
-          <h4 className="filter-section-title">Escales</h4>
-          <div className="filter-options">
-            <label className="filter-option">
+        <div className="fp-section">
+          <h4 className="fp-section-title">Escales</h4>
+          <div className="fp-options">
+            <label className="fp-option">
               <input
                 type="radio"
                 name="stops"
@@ -104,7 +124,7 @@ function FilterPanel({ searchType, filters, onFilterChange }) {
               />
               <span>Toutes</span>
             </label>
-            <label className="filter-option">
+            <label className="fp-option">
               <input
                 type="radio"
                 name="stops"
@@ -114,7 +134,7 @@ function FilterPanel({ searchType, filters, onFilterChange }) {
               />
               <span>Direct uniquement</span>
             </label>
-            <label className="filter-option">
+            <label className="fp-option">
               <input
                 type="radio"
                 name="stops"
@@ -128,40 +148,69 @@ function FilterPanel({ searchType, filters, onFilterChange }) {
         </div>
       )}
 
-      {/* Filtre Équipements (seulement pour les hôtels) */}
+      {/* Filtre Équipements */}
       {searchType === 'hotels' && (
-        <div className="filter-section">
-          <h4 className="filter-section-title">Équipements</h4>
-          <div className="filter-options">
-            <label className="filter-checkbox">
-              <input type="checkbox" />
+        <div className="fp-section">
+          <h4 className="fp-section-title">Équipements</h4>
+          <div className="fp-options">
+            <label className="fp-checkbox">
+              <input 
+                type="checkbox" 
+                value="wifi"
+                checked={filters.amenities?.includes('wifi')}
+                onChange={handleAmenityChange}
+              />
               <span>WiFi gratuit</span>
             </label>
-            <label className="filter-checkbox">
-              <input type="checkbox" />
+            <label className="fp-checkbox">
+              <input 
+                type="checkbox" 
+                value="pool"
+                checked={filters.amenities?.includes('pool')}
+                onChange={handleAmenityChange}
+              />
               <span>Piscine</span>
             </label>
-            <label className="filter-checkbox">
-              <input type="checkbox" />
+            <label className="fp-checkbox">
+              <input 
+                type="checkbox" 
+                value="parking"
+                checked={filters.amenities?.includes('parking')}
+                onChange={handleAmenityChange}
+              />
               <span>Parking</span>
             </label>
-            <label className="filter-checkbox">
-              <input type="checkbox" />
+            <label className="fp-checkbox">
+              <input 
+                type="checkbox" 
+                value="ac"
+                checked={filters.amenities?.includes('ac')}
+                onChange={handleAmenityChange}
+              />
               <span>Climatisation</span>
             </label>
-            <label className="filter-checkbox">
-              <input type="checkbox" />
+            <label className="fp-checkbox">
+              <input 
+                type="checkbox" 
+                value="restaurant"
+                checked={filters.amenities?.includes('restaurant')}
+                onChange={handleAmenityChange}
+              />
               <span>Restaurant</span>
             </label>
           </div>
         </div>
       )}
 
-      {/* Filtre Catégorie (seulement pour les activités) */}
+      {/* Filtre Catégorie */}
       {searchType === 'activities' && (
-        <div className="filter-section">
-          <h4 className="filter-section-title">Catégorie</h4>
-          <select className="filter-select">
+        <div className="fp-section">
+          <h4 className="fp-section-title">Catégorie</h4>
+          <select 
+            className="fp-select"
+            value={filters.category || 'all'}
+            onChange={handleCategoryChange}
+          >
             <option value="all">Toutes les catégories</option>
             <option value="culture">Culture & Patrimoine</option>
             <option value="adventure">Aventure</option>
@@ -171,10 +220,6 @@ function FilterPanel({ searchType, filters, onFilterChange }) {
           </select>
         </div>
       )}
-
-      <button onClick={handleReset} className="btn btn-secondary btn-full">
-        Réinitialiser tous les filtres
-      </button>
     </div>
   );
 }
