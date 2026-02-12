@@ -48,6 +48,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminBookings from './pages/admin/AdminBookings';
 import AdminReviews from './pages/admin/AdminReviews';
 import ProfileAdmin from './pages/admin/ProfileAdmin';
+import AdminContacts from './pages/admin/AdminContacts';
 
 function App() {
   return (
@@ -133,7 +134,7 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-            
+            <Route path="/admin/contacts" element={<AdminContacts />} />
             {/* Route 404 */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

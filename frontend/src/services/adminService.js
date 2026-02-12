@@ -177,7 +177,22 @@ const adminService = {
     } catch (error) {
       throw error.response?.data || error;
     }
-  }
+  },
+  getAllContacts: async () => {
+  const response = await apiService.get('/contact');
+  return response.data;
+},
+
+updateContactStatus: async (contactId, status) => {
+  const response = await apiService.put(`/contact/${contactId}/status?status=${status}`);
+  return response.data;
+},
+
+deleteContact: async (contactId) => {
+  const response = await apiService.delete(`/contact/${contactId}`);
+  return response.data;
+},
+  
 };
 
 export default adminService;

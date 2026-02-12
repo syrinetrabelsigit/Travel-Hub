@@ -6,7 +6,7 @@ const stripeService = {
     try {
       console.log('📤 Envoi createPaymentIntent:', paymentData);
       
-      const response = await apiService.post('/payments/create-payment-intent', paymentData);
+      const response = await apiService.post('/payments/create-intent', paymentData);
       
       console.log('📥 Réponse createPaymentIntent:', response);
       return response;
@@ -43,21 +43,6 @@ const stripeService = {
       console.error('Erreur refundPayment:', error);
       throw error;
     }
-  },
-
-  // LEGACY: Méthode pour compatibilité avec ancien code
-  async createPaymentMethod(cardData) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: 'pm_' + Math.random().toString(36).substr(2, 9),
-          card: {
-            last4: cardData.cardNumber.slice(-4),
-            brand: 'visa'
-          }
-        });
-      }, 1000);
-    });
   }
 };
 

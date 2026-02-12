@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Contact.css';
+import contactService from '../services/contactService';
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -18,11 +19,13 @@ function Contact() {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Logique d'envoi sera implémentée plus tard
-    alert('Message envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.');
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  try {
+    await contactService.sendMessage(formData);
+    alert('✅ Message envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.');
+    
     setFormData({
       name: '',
       email: '',
@@ -30,7 +33,11 @@ function Contact() {
       subject: '',
       message: ''
     });
-  };
+  } catch (error) {
+    console.error('Erreur envoi message:', error);
+    alert('❌ Erreur lors de l\'envoi du message. Veuillez réessayer.');
+  }
+};
 
   const contactMethods = [
     {

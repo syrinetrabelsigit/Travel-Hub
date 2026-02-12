@@ -41,11 +41,11 @@
         </dependency>
 
         <!-- Spring Security -->
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+
         <!-- Validation -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -71,7 +71,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Lombok (CORRECTEMENT CONFIGURÉ) -->
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -107,8 +107,7 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
-
-        <!-- iText PDF (après Stripe) -->
+        <!-- iText PDF -->
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>itext7-core</artifactId>
@@ -130,8 +129,6 @@
             <scope>test</scope>
         </dependency>
 
-
-
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
@@ -142,10 +139,38 @@
 
     <build>
         <plugins>
+
+            <!-- Spring Boot Maven Plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
             </plugin>
+
+            <!-- Maven Compiler Plugin avec Lombok annotation processor -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.30</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 

@@ -76,6 +76,13 @@ function AdminHeader() {
               >
                 ⭐ Modérer Avis
               </Link>
+              <Link 
+                to="/admin/contacts" 
+                className={`nav-link ${isActive('/admin/contacts')}`}
+                onClick={closeMenu}
+              >
+                ✉️ Messages Contact
+              </Link>
               <div className="dropdown-divider-mobile"></div>
               <Link 
                 to="/profileAdmin" 
@@ -133,7 +140,10 @@ function AdminHeader() {
                   <span className="dropdown-icon">⭐</span>
                   Modérer Avis
                 </Link>
-                
+                <Link to="/admin/contacts" className="dropdown-item dropdown-item-admin" onClick={closeMenu}>
+                  <span className="dropdown-icon">✉️</span>
+                  Messages Contact
+                </Link>
                 <div className="dropdown-divider"></div>
                 
                 <div className="dropdown-section-title">Mon Compte</div>

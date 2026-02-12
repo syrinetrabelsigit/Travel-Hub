@@ -7,7 +7,7 @@ import stripeService from '../services/stripeService';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-const stripePromise = loadStripe('pk_test_51SyehhIp57yGvBCs1ryn1Z9unOJaGfhsPeybBdOsn594S9d240WwTDWpdtOqrglVbBnwenNeI9lXQ7lQ2GpBQWYp006kvB0Rt3');
+const stripePromise = loadStripe('pk_test_51SyAkF0LY06YFO7pHFXLZqLwPSaNxwrQq5Ux4exBEpalSxSwSjq21wPMPV7V3sEfVHbX7WCQcvD04TZPZhOh1crs00IAyATshg');
 
 function PaymentFormStripe({ orderData, travelers, billingInfo, onSuccess }) {
   const stripe = useStripe();

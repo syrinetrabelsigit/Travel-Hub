@@ -126,6 +126,11 @@ function AdminDashboard() {
               <h3>Modérer Avis</h3>
               <p>Approuver ou rejeter les avis</p>
             </Link>
+            <Link to="/admin/contacts" className="action-card">
+              <div className="action-icon">✉️</div>
+              <h3>Messages Contact</h3>
+              <p>Gérer les messages reçus</p>
+            </Link>
           </div>
         </div>
 

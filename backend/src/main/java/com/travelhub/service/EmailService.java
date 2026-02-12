@@ -166,6 +166,25 @@ public class EmailService {
 
         System.out.println("=== FIN ENVOI EMAIL RESET ===");
     }
+    public void sendEmail(String to, String subject, String body) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(body, false); // false = texte simple
+
+            mailSender.send(message);
+
+            System.out.println("Email envoyé à : " + to);
+
+        } catch (MessagingException e) {
+            System.err.println("Erreur envoi email : " + e.getMessage());
+            throw new RuntimeException("Erreur lors de l'envoi de l'email");
+        }
+    }
 
     private String buildPasswordResetEmail(String resetUrl) {
         return "<!DOCTYPE html><html><head><style>" +

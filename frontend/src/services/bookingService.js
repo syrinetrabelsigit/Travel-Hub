@@ -1,44 +1,52 @@
-import apiService from './apiService';
+import { apiService } from './api';
+import config from '../config/config';
 
 const bookingService = {
   // Créer une réservation (depuis le panier)
-  async createBooking() {
+  createBooking: async () => {
     try {
-      const response = await apiService.post('/bookings');
-      return response;
+      const response = await apiService.post(config.API_ENDPOINTS.BOOKINGS.CREATE);
+      return response.data;
     } catch (error) {
       console.error('Erreur createBooking:', error);
       throw error;
     }
   },
 
-  // Obtenir une réservation par ID
-  async getBooking(id) {
+  // Obtenir toutes les réservations
+  getBookings: async () => {
     try {
-      const response = await apiService.get(`/bookings/${id}`);
-      return response;
+      const response = await apiService.get(config.API_ENDPOINTS.BOOKINGS.LIST);
+      return response.data;
+    } catch (error) {
+      console.error('Erreur getBookings:', error);
+      throw error;
+    }
+  },
+
+  // Obtenir une réservation par ID
+  getBooking: async (id) => {
+    try {
+      const response = await apiService.get(
+        config.API_ENDPOINTS.BOOKINGS.GET_BY_ID,
+        { id }
+      );
+      return response.data;
     } catch (error) {
       console.error('Erreur getBooking:', error);
       throw error;
     }
   },
 
-  // Obtenir toutes les réservations de l'utilisateur
-  async getUserBookings() {
-    try {
-      const response = await apiService.get('/bookings');
-      return response;
-    } catch (error) {
-      console.error('Erreur getUserBookings:', error);
-      throw error;
-    }
-  },
-
   // Annuler une réservation
-  async cancelBooking(id) {
+  cancelBooking: async (id) => {
     try {
-      const response = await apiService.put(`/bookings/${id}/cancel`);
-      return response;
+      const response = await apiService.post(
+        config.API_ENDPOINTS.BOOKINGS.CANCEL,
+        {},
+        { id }
+      );
+      return response.data;
     } catch (error) {
       console.error('Erreur cancelBooking:', error);
       throw error;
@@ -46,10 +54,10 @@ const bookingService = {
   },
 
   // Télécharger la facture PDF
-  async downloadInvoice(id) {
+  downloadInvoice: async (id) => {
     try {
-      const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api'}/bookings/${id}/invoice`, {
+      const token = localStorage.getItem('travelhub_auth_token');
+      const response = await fetch(`http://localhost:8085/api/bookings/${id}/invoice`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -57,18 +65,10 @@ const bookingService = {
       });
 
       if (!response.ok) {
-        throw new Error('Erreur lors du téléchargement de la facture');
+        throw new Error('Erreur téléchargement facture');
       }
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `facture-${id}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      return await response.blob();
     } catch (error) {
       console.error('Erreur downloadInvoice:', error);
       throw error;

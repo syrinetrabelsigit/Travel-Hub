@@ -1,6 +1,6 @@
 // URLs de l'API
 export const API_URLS = {
-  BASE: process.env.REACT_APP_API_URL || 'http://localhost:8080/api',
+  BASE: process.env.REACT_APP_API_URL || 'http://localhost:8085/api',
   AUTH: '/auth',
   SEARCH: '/search',
   BOOKINGS: '/bookings',

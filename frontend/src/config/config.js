@@ -1,11 +1,10 @@
 // Configuration de l'application
 const config = {
   // URL de l'API Backend (Spring Boot)
-  API_BASE_URL: process.env.REACT_APP_API_URL || 'http://localhost:8080/api',
+  API_BASE_URL: process.env.REACT_APP_API_URL || 'http://localhost:8085/api',
   
-  // AJOUT : Clé publique Stripe
-  STRIPE_PUBLIC_KEY: process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_51SyehhIp57yGvBCs1ryn1Z9unOJaGfhsPeybBdOsn594S9d240WwTDWpdtOqrglVbBnwenNeI9lXQ7lQ2GpBQWYp006kvB0Rt3',
-
+  // Clé publique Stripe
+STRIPE_PUBLIC_KEY: process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_51SyAkF0LY06YFO7pHFXLZqLwPSaNxwrQq5Ux4exBEpalSxSwSjq21wPMPV7V3sEfVHbX7WCQcvD04TZPZhOh1crs00IAyATshg',
   // Endpoints API
   API_ENDPOINTS: {
     AUTH: {
@@ -44,12 +43,10 @@ const config = {
       SEARCH: '/search/flights',
       GET_BY_ID: '/search/flight/:id'
     },
-    
     HOTELS: {
       SEARCH: '/search/hotels',
       GET_BY_ID: '/search/hotel/:id'
     },
-    
     ACTIVITIES: {
       SEARCH: '/search/activities',
       GET_BY_ID: '/search/activity/:id'
@@ -77,12 +74,10 @@ const config = {
       CONFIRM: '/payments/confirm',
       REFUND: '/payments/refund/:bookingId'
     },
-    
     CURRENCY: {
       SUPPORTED: '/currency/supported',
       CONVERT: '/currency/convert'
     },
-    // Admin
     ADMIN: {
       STATS: '/admin/stats',
       USERS: '/admin/users',
@@ -100,8 +95,7 @@ const config = {
       REJECT_REVIEW: '/admin/reviews/:id/reject',
       DELETE_REVIEW: '/admin/reviews/:id',
       ADMIN_PROFILE: '/profileAdmin'
-
-    },
+    }
   },
 
   // Timeout pour les requêtes API (en millisecondes)
